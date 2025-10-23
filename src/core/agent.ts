@@ -327,7 +327,9 @@ export async function getAgentInstance(): Promise<Agent> {
 export async function getAgent(): Promise<Agent> {
   if (!agentInstance) {
     agentInstance = await Agent.createFromEnv({
-      dbPath: (inboxId) => ".xmtp/" + `cli-${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+      dbPath: (inboxId) =>
+        process.env.RAILWAY_VOLUME_MOUNT_PATH ??
+        ".xmtp/" + `cli-${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
     });
   }
   return agentInstance;
