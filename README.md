@@ -215,24 +215,3 @@ Start the Slack bot with:
 ```bash
 yarn start
 ```
-
-### Resources
-
-- Commands: CLI command implementations - [see section](./src/commands/)
-- Core: Core XMTP agent functionality - [see section](./src/core/)
-- CLI: CLI infrastructure and utilities - [see section](./src/cli/)
-- Slack: Slack bot implementation - [see section](./src/slack/)
-- Utils: Shared utilities - [see section](./src/utils/)
-- Config: Configuration files - [see section](./config/)
-- Data: Static data files - [see section](./data/)
-
-##### Rate limits
-
-- Read operations: 20,000 requests per 5-minute window
-- Write operations: 3,000 messages published per 5-minute window
-
-##### Endpoints
-
-- `local`: `http://localhost:5556`
-- `dev`: `https://grpc.dev.xmtp.network:443`
-- `production`: `https://grpc.production.xmtp.network:443`
