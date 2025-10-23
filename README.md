@@ -1,50 +1,149 @@
-# XMTP Agent - Claude Code CLI & Slack Integration
+# XMTP Agent
 
 A powerful XMTP agent that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
 
-## 🏗️ Architecture
+## Architecture
 
-This project follows a clean, modular architecture:
+This flowchart illustrates the XMTP Agent's modular architecture and integration points:
 
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
+
+flowchart LR
+  %% Core components
+  subgraph Core["Core XMTP"]
+    agent["Agent Management"]
+    utils["Utilities"]
+  end
+
+  subgraph CLI["CLI Interface"]
+    commands["Commands"]
+    manager["CLI Manager"]
+    params["Parameter Parser"]
+  end
+
+  subgraph Slack["Slack Integration"]
+    bot["Slack Bot"]
+    sessions["Session Management"]
+  end
+
+  subgraph Commands["Command Modules"]
+    groups["Groups"]
+    send["Send Messages"]
+    debug["Debug & Info"]
+    permissions["Permissions"]
+    conversations["Conversations"]
+  end
+
+  subgraph Utils["Utilities"]
+    files["File Operations"]
+    validation["Input Validation"]
+  end
+
+  %% Connections
+  agent --> commands
+  commands --> groups
+  commands --> send
+  commands --> debug
+  commands --> permissions
+  commands --> conversations
+
+  manager --> commands
+  params --> commands
+
+  bot --> agent
+  sessions --> bot
+
+  files --> commands
+  validation --> commands
+
+  linkStyle 0,1,2,3,4,5 stroke:#f66,stroke-width:4px,stroke-dasharray: 5,5;
+  classDef highlightStroke stroke:#f66,color:#c9d1d9,stroke-width:4px;
+  class agent,commands,bot,groups highlightStroke;
 ```
-src/
-├── commands/           # CLI command implementations
-│   ├── conversations.ts
-│   ├── debug.ts
-│   ├── groups.ts
-│   ├── permissions.ts
-│   └── send.ts
-├── core/              # Core XMTP functionality
-│   └── agent.ts       # Agent management and utilities
-├── cli/               # CLI infrastructure
-│   ├── cli-manager.ts # CLI execution manager
-│   ├── cli-params.ts  # Parameter parsing
-│   └── cli-utils.ts   # CLI utilities
-├── slack/             # Slack bot integration
-│   └── bot.ts         # Slack bot implementation
-└── utils/             # General utilities
-    ├── files.ts       # File operations
-    └── validation.ts  # Input validation
+
+> The highlighted path (red dashed line) shows the main command execution flow from CLI to XMTP operations.
+
+The XMTP Agent provides a comprehensive interface for XMTP protocol operations through both CLI and Slack bot interfaces. The architecture is designed with modularity in mind, allowing for easy extension and maintenance.
+
+#### Core functionality
+
+- **CLI Interface**: Command-line operations for XMTP protocol testing
+- **Slack Integration**: Interactive bot for real-time XMTP operations
+- **Group Management**: Create and manage XMTP groups and conversations
+- **Message Operations**: Send messages, debug information, and manage permissions
+- **Session Management**: Maintain context across interactions
+
+## Documentation
+
+- Commands: CLI command reference and usage - see [section](./docs/CLAUDE.md)
+- Architecture: Project structure and design patterns - see [section](#architecture)
+- Development: Setup and development guidelines - see [section](#development)
+
+## Tools & utilities
+
+- CLI: Command line interface for XMTP operations - see [section](#available-commands)
+- Slack Bot: Interactive Slack integration - see [section](#slack-integration)
+- Debug: Debug and information gathering tools - see [section](#debug--information)
+- Groups: Group management and operations - see [section](#groups-management)
+- Permissions: Permission management and updates - see [section](#permissions-management)
+
+## Development
+
+#### Prerequisites
+
+- Node.js (>20.18.0)
+- Yarn 4.6.0
+- XMTP environment access
+
+#### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/xmtp-agent
+cd xmtp-agent
+
+# Install dependencies
+yarn install
+
+# Generate XMTP keys
+yarn gen:keys
 ```
 
-## 🚀 Quick Start
+#### Environment variables
 
-1. **Install dependencies:**
-   ```bash
-   yarn install
-   ```
+```bash
+XMTP_WALLET_KEY=your_wallet_key
+XMTP_ENCRYPTION_KEY=your_encryption_key
+XMTP_ENV=dev
+SLACK_BOT_TOKEN=your_slack_bot_token
+SLACK_SIGNING_SECRET=your_slack_signing_secret
+```
 
-2. **Generate XMTP keys:**
-   ```bash
-   yarn gen:keys
-   ```
+### Running the application
 
-3. **Start the Slack bot:**
-   ```bash
-   yarn start
-   ```
+To get started, set up the environment variables and run the application:
 
-## 📋 Available Commands
+```bash
+# Start the Slack bot
+yarn start
+
+# Run CLI commands
+yarn groups
+yarn send --target 0x1234... --message "Hello!"
+```
+
+#### Debug mode
+
+```bash
+# Run with debug logging
+yarn start --debug
+
+# Run CLI with verbose output
+yarn groups --verbose
+```
+
+## Available Commands
 
 ### Groups Management
 ```bash
@@ -103,7 +202,7 @@ yarn conversations list
 yarn conversations get --conversation-id <conversation-id>
 ```
 
-## 🤖 Slack Integration
+## Slack Integration
 
 The Slack bot provides an interactive interface for all XMTP operations:
 
@@ -117,62 +216,23 @@ Start the Slack bot with:
 yarn start
 ```
 
-## 🛠️ Development
+### Resources
 
-### Project Structure
-- **`src/commands/`** - CLI command implementations
-- **`src/core/`** - Core XMTP agent functionality
-- **`src/cli/`** - CLI infrastructure and utilities
-- **`src/slack/`** - Slack bot implementation
-- **`src/utils/`** - Shared utilities
-- **`config/`** - Configuration files (TypeScript, ESLint)
-- **`data/`** - Static data files
-- **`docs/`** - Documentation
+- Commands: CLI command implementations - [see section](./src/commands/)
+- Core: Core XMTP agent functionality - [see section](./src/core/)
+- CLI: CLI infrastructure and utilities - [see section](./src/cli/)
+- Slack: Slack bot implementation - [see section](./src/slack/)
+- Utils: Shared utilities - [see section](./src/utils/)
+- Config: Configuration files - [see section](./config/)
+- Data: Static data files - [see section](./data/)
 
-### Building and Linting
-```bash
-# Build the project
-yarn build
+##### Rate limits
 
-# Run linting
-yarn lint
+- Read operations: 20,000 requests per 5-minute window
+- Write operations: 3,000 messages published per 5-minute window
 
-# Format code
-yarn format
+##### Endpoints
 
-# Clean build artifacts
-yarn clean
-```
-
-### Environment Setup
-Create a `.env` file with your XMTP configuration:
-```env
-XMTP_WALLET_KEY=your_wallet_key
-XMTP_ENCRYPTION_KEY=your_encryption_key
-XMTP_ENV=dev
-SLACK_BOT_TOKEN=your_slack_bot_token
-SLACK_SIGNING_SECRET=your_slack_signing_secret
-```
-
-## 📚 Documentation
-
-- **`docs/CLAUDE.md`** - Comprehensive command reference
-- **`docs/README.md`** - This file
-
-## 🔧 Configuration
-
-- **TypeScript**: `config/tsconfig.json`
-- **ESLint**: `config/eslint.config.js`
-- **Package**: `package.json`
-
-## 🎯 Purpose
-
-This XMTP agent serves as:
-- **Development tool** for XMTP protocol testing
-- **CLI interface** for XMTP operations
-- **Slack bot** for interactive XMTP management
-- **Integration platform** for Claude Code Skills
-
-## 📄 License
-
-See `LICENSE.md` for license information.
+- `local`: `http://localhost:5556`
+- `dev`: `https://grpc.dev.xmtp.network:443`
+- `production`: `https://grpc.production.xmtp.network:443`
