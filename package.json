@@ -1,0 +1,56 @@
+{
+  "name": "xmtp-qa-tools",
+  "version": "0.4.7",
+  "private": true,
+  "description": "XMTP protocol QA and testing tools with Claude Code Skills integration",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p config/tsconfig.json",
+    "c": "yarn build && yarn lint && yarn format",
+    "clean": "rimraf .xmtp/ ||: && rimraf logs/ ||  :",
+    "chat": "tsx scripts/chat-cli.tsx",
+    "gen:keys": "tsx scripts/generateKeys.ts",
+    "send": "tsx src/commands/send.ts",
+    "permissions": "tsx src/commands/permissions.ts",
+    "groups": "tsx src/commands/groups.ts",
+    "conversations": "tsx src/commands/conversations.ts",
+    "debug": "tsx src/commands/debug.ts",
+    "start": "tsx src/slack/bot.ts",
+    "format": "prettier -w .",
+    "lint": "eslint . --config config/eslint.config.js"
+  },
+  "dependencies": {
+    "@slack/bolt": "^4.5.0",
+    "@types/express": "^5.0.3",
+    "@types/react": "^19.2.2",
+    "@xmtp/agent-sdk": "latest",
+    "@xmtp/content-type-markdown": "^1.0.0",
+    "@xmtp/content-type-reaction": "^2.0.2",
+    "@xmtp/content-type-reply": "^2.0.2",
+    "@xmtp/content-type-wallet-send-calls": "^2.0.0",
+    "dotenv": "^17.2.3",
+    "ink": "^6.3.1",
+    "ink-text-input": "^6.0.0",
+    "react": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.6",
+    "@eslint/js": "^9.19.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
+    "@types/eslint__js": "^8.42.3",
+    "@types/node": "^20.0.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-packagejson": "^2.5.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.22.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}
