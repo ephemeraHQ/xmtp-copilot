@@ -114,3 +114,53 @@ yarn link
 echo 'export PATH="$HOME/.yarn/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
+
+#### Environment variables
+
+Create a `.env` file in the project root:
+
+```bash
+XMTP_WALLET_KEY=your_wallet_key
+XMTP_ENCRYPTION_KEY=your_encryption_key
+XMTP_ENV=dev
+SLACK_BOT_TOKEN=your_slack_bot_token
+SLACK_SIGNING_SECRET=your_slack_signing_secret
+```
+
+## Usage
+
+### Global CLI Commands
+
+After installation, use the `xmtp` command from anywhere:
+
+```bash
+# Start Claude Code AI assistant
+xmtp ai
+
+# Start XMTP channels
+xmtp start              # Both XMTP and Slack channels
+xmtp xmtp               # XMTP channel only
+xmtp slack              # Slack channel only
+
+# Quick command examples
+xmtp groups --members 5 --name "My Group"
+xmtp send --target 0x1234... --message "Hello!"
+xmtp debug info
+xmtp permissions list --group-id <group-id>
+xmtp list
+
+# Get help
+xmtp --help
+xmtp <command> --help
+```
+
+### Available Commands
+
+- **`ai`** - Launch Claude Code AI assistant
+- **`start`** - Start both XMTP and Slack channels
+- **`groups`** - Create and manage XMTP groups/DMs
+- **`send`** - Send messages to conversations
+- **`debug`** - System information and debugging
+- **`permissions`** - Manage group permissions
+- **`list`** - List conversations
+- **`content`** - Content type operations
