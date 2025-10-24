@@ -1,8 +1,8 @@
 {
-  "name": "xmtp-qa-tools",
+  "name": "xmtp-copilot",
   "version": "0.4.7",
   "private": true,
-  "description": "XMTP protocol QA and testing tools with Claude Code Skills integration",
+  "description": "XMTP Copilot - CLI commands and Slack bot integration for XMTP protocol testing and management",
   "type": "module",
   "scripts": {
     "dev:xmtp": "tsx src/channels/xmtp.ts",

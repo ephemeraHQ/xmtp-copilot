@@ -18,7 +18,7 @@ import { CliManager } from "../cli/cli-manager";
 class USDCHandler {
   constructor(private network: string) {}
 
-  createUSDCTransferCalls(from: string, to: string, amount: number) {
+  createUSDCTransferCalls(from: string, to: string, ) {
     // This is a placeholder - implement based on your actual USDC handler
     return {
       version: "1.0",
@@ -382,13 +382,11 @@ async function sendTransactionContent(config: Config): Promise<void> {
     const amount = config.amount || 0.1;
 
     // Convert amount to USDC decimals (6 decimal places)
-    const amountInDecimals = Math.floor(amount * Math.pow(10, 6));
 
     const usdcHandler = new USDCHandler("base-sepolia");
     const walletSendCalls = usdcHandler.createUSDCTransferCalls(
       config.target as string,
       agentAddress,
-      amountInDecimals,
     );
 
     await conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
