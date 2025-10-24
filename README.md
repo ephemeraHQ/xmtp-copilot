@@ -69,10 +69,11 @@ The XMTP Agent provides a comprehensive interface for XMTP protocol operations t
 #### Core functionality
 
 - **CLI Interface**: Command-line operations for XMTP protocol testing
-- **Slack Integration**: Interactive bot for real-time XMTP operations
+- **Slack Integration**: Interactive bot for real-time XMTP operations with Claude CLI
+- **XMTP Channel**: Message relay through Claude CLI for AI-powered responses
 - **Group Management**: Create and manage XMTP groups and conversations
 - **Message Operations**: Send messages, debug information, and manage permissions
-- **Session Management**: Maintain context across interactions
+- **Session Management**: Maintain conversation context across both channels
 
 ## Documentation
 
@@ -125,10 +126,14 @@ SLACK_SIGNING_SECRET=your_slack_signing_secret
 To get started, set up the environment variables and run the application:
 
 ```bash
-# Start the Slack bot
-yarn start
+# Run both XMTP and Slack channels simultaneously (recommended)
+yarn dev:channels
 
-# Run CLI commands
+# Or run channels individually:
+yarn dev:xmtp    # XMTP channel listener only
+yarn dev:slack   # Slack bot only
+
+# Run CLI commands (one-off operations):
 yarn groups
 yarn send --target 0x1234... --message "Hello!"
 ```
@@ -215,24 +220,3 @@ Start the Slack bot with:
 ```bash
 yarn start
 ```
-
-### Resources
-
-- Commands: CLI command implementations - [see section](./src/commands/)
-- Core: Core XMTP agent functionality - [see section](./src/core/)
-- CLI: CLI infrastructure and utilities - [see section](./src/cli/)
-- Slack: Slack bot implementation - [see section](./src/slack/)
-- Utils: Shared utilities - [see section](./src/utils/)
-- Config: Configuration files - [see section](./config/)
-- Data: Static data files - [see section](./data/)
-
-##### Rate limits
-
-- Read operations: 20,000 requests per 5-minute window
-- Write operations: 3,000 messages published per 5-minute window
-
-##### Endpoints
-
-- `local`: `http://localhost:5556`
-- `dev`: `https://grpc.dev.xmtp.network:443`
-- `production`: `https://grpc.production.xmtp.network:443`

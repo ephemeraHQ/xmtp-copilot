@@ -20,7 +20,7 @@ import {
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
-  operation: "list" | "members" | "messages";
+  operation: "conversations" | "members" | "messages";
   // Conversation ID for specific operations
   conversationId?: string;
   // Pagination options
@@ -31,7 +31,7 @@ interface Config extends StandardCliParams {
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ['list', 'members', 'messages'],
+      flags: ['conversations', 'members', 'messages'],
       type: 'string' as const,
       description: 'Operation to perform',
       required: true,
@@ -59,17 +59,17 @@ function showHelp() {
   };
 
   const examples = [
-    'yarn conversations list',
-    'yarn conversations list --limit 20',
-    'yarn conversations members --conversation-id <conversation-id>',
-    'yarn conversations messages --conversation-id <conversation-id>',
-    'yarn conversations messages --conversation-id <conversation-id> --limit 10',
+    'yarn list conversations',
+    'yarn list conversations --limit 20',
+    'yarn list members --conversation-id <conversation-id>',
+    'yarn list messages --conversation-id <conversation-id>',
+    'yarn list messages --conversation-id <conversation-id> --limit 10',
   ];
 
   console.log(generateHelpText(
-    'XMTP conversations - List and explore conversations',
+    'XMTP list - List conversations, members, and messages',
     'List your conversations, get members, and retrieve messages from specific conversations',
-    'yarn conversations [operation] [options]',
+    'yarn list [operation] [options]',
     customParams,
     examples
   ));
@@ -85,7 +85,7 @@ function parseArgs(): Config {
   }
 
   // Extract operation from first argument if not a flag
-  let operation = "list";
+  let operation = "conversations";
   let remainingArgs = args;
   
   if (args.length > 0 && !args[0].startsWith("--")) {
@@ -117,7 +117,7 @@ function parseArgs(): Config {
   };
 
   const config = parseStandardArgs(remainingArgs, customParams) as Config;
-  config.operation = operation as "list" | "members" | "messages";
+  config.operation = operation as "conversations" | "members" | "messages";
 
   // Validation
   if (config.conversationId && !validateGroupId(config.conversationId)) {
@@ -128,7 +128,7 @@ function parseArgs(): Config {
 }
 
 // Operation: List Conversations
-async function runListOperation(config: Config): Promise<void> {
+async function runConversationsOperation(config: Config): Promise<void> {
   const limit = config.limit ?? 50;
   const offset = config.offset ?? 0;
   
@@ -192,12 +192,12 @@ async function runMembersOperation(config: Config): Promise<void> {
   if (!config.conversationId) {
     console.error(`❌ Error: --conversation-id is required for members operation`);
     console.log(
-      `   Usage: yarn conversations members --conversation-id <conversation-id>`,
+      `   Usage: yarn list members --conversation-id <conversation-id>`,
     );
     return;
   }
 
-  logOperationStart("Get Members", `Retrieving members from conversation: ${config.conversationId}`);
+  logOperationStart("List Members", `Retrieving members from conversation: ${config.conversationId}`);
 
   // Get agent
   const agent = await getAgentInstance();
@@ -221,7 +221,7 @@ async function runMembersOperation(config: Config): Promise<void> {
       console.log(`   Type: DM`);
       console.log(`   URL: https://xmtp.chat/conversations/${conversation.id}`);
       console.log(`\n   Note: DMs don't have explicit member lists - they are between two parties`);
-      logOperationSuccess("Get Members");
+      logOperationSuccess("List Members");
       return;
     }
 
@@ -253,9 +253,9 @@ async function runMembersOperation(config: Config): Promise<void> {
       console.log(`   No members found in this group`);
     }
 
-    logOperationSuccess("Get Members");
+    logOperationSuccess("List Members");
   } catch (error) {
-    logOperationFailure("Get Members", error as Error);
+    logOperationFailure("List Members", error as Error);
     return;
   }
 }
@@ -265,7 +265,7 @@ async function runMessagesOperation(config: Config): Promise<void> {
   if (!config.conversationId) {
     console.error(`❌ Error: --conversation-id is required for messages operation`);
     console.log(
-      `   Usage: yarn conversations messages --conversation-id <conversation-id>`,
+      `   Usage: yarn list messages --conversation-id <conversation-id>`,
     );
     return;
   }
@@ -273,7 +273,7 @@ async function runMessagesOperation(config: Config): Promise<void> {
   const limit = config.limit ?? 50;
   const offset = config.offset ?? 0;
 
-  logOperationStart("Get Messages", `Retrieving messages from conversation: ${config.conversationId} (limit: ${limit}, offset: ${offset})`);
+  logOperationStart("List Messages", `Retrieving messages from conversation: ${config.conversationId} (limit: ${limit}, offset: ${offset})`);
 
   // Get agent
   const agent = await getAgentInstance();
@@ -337,9 +337,9 @@ async function runMessagesOperation(config: Config): Promise<void> {
       console.log(`   No messages found in this conversation`);
     }
 
-    logOperationSuccess("Get Messages");
+    logOperationSuccess("List Messages");
   } catch (error) {
-    logOperationFailure("Get Messages", error as Error);
+    logOperationFailure("List Messages", error as Error);
     return;
   }
 }
@@ -365,10 +365,10 @@ async function handleCliManagerExecution(): Promise<void> {
   const { skillArgs, config: managerConfig } = CliManager.parseManagerArgs(args);
   
   if (managerConfig.repeat && managerConfig.repeat > 1) {
-    console.log(`🔄 CLI Manager: Executing conversations command ${managerConfig.repeat} time(s)`);
+    console.log(`🔄 CLI Manager: Executing list command ${managerConfig.repeat} time(s)`);
     
     const manager = new CliManager(managerConfig);
-    const results = await manager.executeYarnCommand('conversations', skillArgs, managerConfig);
+    const results = await manager.executeYarnCommand('list', skillArgs, managerConfig);
     
     // Exit with error code if any execution failed
     const hasFailures = results.some(r => !r.success);
@@ -383,8 +383,8 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   switch (config.operation) {
-    case "list":
-      await runListOperation(config);
+    case "conversations":
+      await runConversationsOperation(config);
       break;
     case "members":
       await runMembersOperation(config);
@@ -401,3 +401,4 @@ async function main(): Promise<void> {
 }
 
 void handleCliManagerExecution();
+
