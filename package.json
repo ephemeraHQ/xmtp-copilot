@@ -5,6 +5,7 @@
   "description": "XMTP protocol QA and testing tools with Claude Code Skills integration",
   "type": "module",
   "scripts": {
+    "dev":"claude",
     "build": "tsc -p config/tsconfig.json",
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .xmtp/ ||: && rimraf logs/ ||  :",
