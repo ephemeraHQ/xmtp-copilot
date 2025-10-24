@@ -1,8 +1,13 @@
 # XMTP Copilot
 
+A powerful XMTP copilot that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
+
+```
+xmtp ai
+```
+
 ![](./screenshot.png)
 
-A powerful XMTP copilot that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
 
 ## Usage
 
