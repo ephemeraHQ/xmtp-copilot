@@ -14,7 +14,7 @@
     "send": "tsx src/commands/send.ts",
     "permissions": "tsx src/commands/permissions.ts",
     "groups": "tsx src/commands/groups.ts",
-    "conversations": "tsx src/commands/conversations.ts",
+    "list": "tsx src/commands/list.ts",
     "debug": "tsx src/commands/debug.ts",
     "start": "tsx src/slack/bot.ts",
     "format": "prettier -w .",
