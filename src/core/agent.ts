@@ -1,6 +1,15 @@
 import { Agent } from "@xmtp/agent-sdk";
 import newInboxes2 from "../../data/inboxes.json";
-
+import {
+  MarkdownCodec,
+} from "@xmtp/content-type-markdown";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import {
+  AttachmentCodec,
+  RemoteAttachmentCodec,
+} from "@xmtp/content-type-remote-attachment";
+import { ReplyCodec } from "@xmtp/content-type-reply";
 // ============================================================================
 // ERROR HANDLING
 // ============================================================================
@@ -339,6 +348,14 @@ export async function getAgent(): Promise<Agent> {
     agentInstance = await Agent.createFromEnv({
       dbPath: (inboxId) =>
         `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "."}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+      codecs: [
+        new MarkdownCodec(),
+        new ReactionCodec(),
+        new ReplyCodec(),
+        new RemoteAttachmentCodec(),
+        new AttachmentCodec(),
+        new WalletSendCallsCodec(),
+      ],
     });
   }
   return agentInstance;
