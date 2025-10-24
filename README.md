@@ -2,46 +2,7 @@
 
 A powerful XMTP copilot that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
 
-
-#### Prerequisites
-
-- Node.js (>20.18.0)
-- Yarn 4.6.0
-- XMTP environment access
-
-#### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/your-org/xmtp-copilot
-cd xmtp-copilot
-
-# Install dependencies
-yarn install
-
-# Link globally to use 'xmtp' command anywhere
-yarn link
-
-# Add yarn global bin to your PATH (if not already added)
-echo 'export PATH="$HOME/.yarn/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
-
-#### Environment variables
-
-Create a `.env` file in the project root:
-
-```bash
-XMTP_WALLET_KEY=your_wallet_key
-XMTP_ENCRYPTION_KEY=your_encryption_key
-XMTP_ENV=dev
-SLACK_BOT_TOKEN=your_slack_bot_token
-SLACK_SIGNING_SECRET=your_slack_signing_secret
-```
-
 ## Usage
-
-### Global CLI Commands
 
 After installation, use the `xmtp` command from anywhere:
 
@@ -64,4 +25,42 @@ xmtp list
 # Get help
 xmtp --help
 xmtp <command> --help
+```
+
+## Development
+
+### Prerequisites
+
+- Node.js (>20.18.0)
+- Yarn 4.6.0
+- XMTP environment access
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/your-org/xmtp-copilot
+cd xmtp-copilot
+
+# Install dependencies
+yarn install
+
+# Link globally to use 'xmtp' command anywhere
+yarn link
+
+# Add yarn global bin to your PATH (if not already added)
+echo 'export PATH="$HOME/.yarn/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### Environment variables
+
+Create a `.env` file in the project root:
+
+```bash
+XMTP_WALLET_KEY=your_wallet_key
+XMTP_ENCRYPTION_KEY=your_encryption_key
+XMTP_ENV=dev
+SLACK_BOT_TOKEN=your_slack_bot_token
+SLACK_SIGNING_SECRET=your_slack_signing_secret
 ```
