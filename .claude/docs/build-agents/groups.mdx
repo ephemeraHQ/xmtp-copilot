@@ -21,9 +21,9 @@ const groupDescription = group.description;
 const groupImageUrl = group.imageUrl;
 
 // Update metadata
-await group.updateName('New Group Name');
-await group.updateDescription('New Group Description');
-await group.updateImageUrl('newurl.com');
+await group.updateName("New Group Name");
+await group.updateDescription("New Group Description");
+await group.updateImageUrl("newurl.com");
 ```
 
 ## Manage group chat membership
@@ -40,7 +40,7 @@ You can add members directly by their Ethereum addresses using `addMembersByIden
 
 ```js [Node]
 // Add members by Ethereum address
-await group.addMembersByIdentifiers([ 
+await group.addMembersByIdentifiers([
   {
     identifier: "0x1234567890123456789012345678901234567890",
     identifierKind: IdentifierKind.Ethereum,
@@ -82,7 +82,6 @@ await group.sync();
 
 // Get all members
 const members = await group.members();
-
 ```
 
 ## Manage group chat admins
@@ -108,7 +107,7 @@ await group.removeSuperAdmin(inboxId);
 Get detailed information about group members:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const members = await group.members();
 
   for (const member of members) {
@@ -118,7 +117,7 @@ agent.on('text', async (ctx) => {
 
     // Get Ethereum address
     const ethIdentifier = member.accountIdentifiers.find(
-      (id) => id.identifierKind === IdentifierKind.Ethereum
+      (id) => id.identifierKind === IdentifierKind.Ethereum,
     );
 
     if (ethIdentifier) {

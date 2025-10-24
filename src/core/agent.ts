@@ -1,7 +1,15 @@
-
 import { Agent } from "@xmtp/agent-sdk";
 import newInboxes2 from "../../data/inboxes.json";
-
+import {
+  MarkdownCodec,
+} from "@xmtp/content-type-markdown";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import {
+  AttachmentCodec,
+  RemoteAttachmentCodec,
+} from "@xmtp/content-type-remote-attachment";
+import { ReplyCodec } from "@xmtp/content-type-reply";
 // ============================================================================
 // ERROR HANDLING
 // ============================================================================
@@ -13,7 +21,7 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     return error;
   }
   return String(error);
@@ -22,14 +30,18 @@ export function getErrorMessage(error: unknown): string {
 /**
  * Create a standardized error with context
  */
-export function createError(message: string, context?: string, originalError?: unknown): Error {
+export function createError(
+  message: string,
+  context?: string,
+  originalError?: unknown,
+): Error {
   const fullMessage = context ? `${context}: ${message}` : message;
   const error = new Error(fullMessage);
-  
+
   if (originalError) {
     error.cause = originalError;
   }
-  
+
   return error;
 }
 
@@ -39,19 +51,19 @@ export function createError(message: string, context?: string, originalError?: u
 export async function withErrorHandling<T>(
   operation: () => Promise<T>,
   context: string,
-  fallback?: T
+  fallback?: T,
 ): Promise<T> {
   try {
     return await operation();
   } catch (error) {
     const errorMessage = getErrorMessage(error);
     const wrappedError = createError(errorMessage, context, error);
-    
+
     if (fallback !== undefined) {
       console.warn(`⚠️  ${context} failed, using fallback: ${errorMessage}`);
       return fallback;
     }
-    
+
     throw wrappedError;
   }
 }
@@ -62,19 +74,19 @@ export async function withErrorHandling<T>(
 export function withSyncErrorHandling<T>(
   operation: () => T,
   context: string,
-  fallback?: T
+  fallback?: T,
 ): T {
   try {
     return operation();
   } catch (error) {
     const errorMessage = getErrorMessage(error);
     const wrappedError = createError(errorMessage, context, error);
-    
+
     if (fallback !== undefined) {
       console.warn(`⚠️  ${context} failed, using fallback: ${errorMessage}`);
       return fallback;
     }
-    
+
     throw wrappedError;
   }
 }
@@ -86,7 +98,7 @@ export async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   context: string,
   maxRetries: number = 3,
-  baseDelay: number = 1000
+  baseDelay: number = 1000,
 ): Promise<T> {
   let lastError: Error | undefined;
 
@@ -108,18 +120,14 @@ export async function retryWithBackoff<T>(
     }
   }
 
-  throw createError(
-    `Failed all ${maxRetries} attempts`,
-    context,
-    lastError
-  );
+  throw createError(`Failed all ${maxRetries} attempts`, context, lastError);
 }
 
 // ============================================================================
 // LOGGING
 // ============================================================================
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+export type LogLevel = "debug" | "info" | "warn" | "error";
 
 export interface LoggerConfig {
   level: LogLevel;
@@ -131,7 +139,7 @@ export interface LoggerConfig {
  * Default logger configuration
  */
 const DEFAULT_CONFIG: LoggerConfig = {
-  level: 'info',
+  level: "info",
   timestamp: false,
 };
 
@@ -145,56 +153,66 @@ export class Logger {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
-  private formatMessage(level: LogLevel, message: string, emoji?: string): string {
-    const timestamp = this.config.timestamp ? `[${new Date().toISOString()}] ` : '';
-    const prefix = this.config.prefix ? `[${this.config.prefix}] ` : '';
-    const icon = emoji ? `${emoji} ` : '';
-    
+  private formatMessage(
+    level: LogLevel,
+    message: string,
+    emoji?: string,
+  ): string {
+    const timestamp = this.config.timestamp
+      ? `[${new Date().toISOString()}] `
+      : "";
+    const prefix = this.config.prefix ? `[${this.config.prefix}] ` : "";
+    const icon = emoji ? `${emoji} ` : "";
+
     return `${timestamp}${prefix}${icon}${message}`;
   }
 
   private shouldLog(level: LogLevel): boolean {
-    const levels: LogLevel[] = ['debug', 'info', 'warn', 'error'];
+    const levels: LogLevel[] = ["debug", "info", "warn", "error"];
     return levels.indexOf(level) >= levels.indexOf(this.config.level);
   }
 
   debug(message: string): void {
-    if (this.shouldLog('debug')) {
-      console.log(this.formatMessage('debug', message, '🐛'));
+    if (this.shouldLog("debug")) {
+      console.log(this.formatMessage("debug", message, "🐛"));
     }
   }
 
   info(message: string): void {
-    if (this.shouldLog('info')) {
-      console.log(this.formatMessage('info', message, 'ℹ️'));
+    if (this.shouldLog("info")) {
+      console.log(this.formatMessage("info", message, "ℹ️"));
     }
   }
 
   warn(message: string): void {
-    if (this.shouldLog('warn')) {
-      console.log(this.formatMessage('warn', message, '⚠️'));
+    if (this.shouldLog("warn")) {
+      console.log(this.formatMessage("warn", message, "⚠️"));
     }
   }
 
   error(message: string): void {
-    if (this.shouldLog('error')) {
-      console.error(this.formatMessage('error', message, '❌'));
+    if (this.shouldLog("error")) {
+      console.error(this.formatMessage("error", message, "❌"));
     }
   }
 
   success(message: string): void {
-    if (this.shouldLog('info')) {
-      console.log(this.formatMessage('info', message, '✅'));
+    if (this.shouldLog("info")) {
+      console.log(this.formatMessage("info", message, "✅"));
     }
   }
 
   operationStart(operation: string, details?: string): void {
-    const message = details ? `Starting ${operation}: ${details}` : `Starting ${operation}`;
-    this.info(this.formatMessage('info', message, '🚀'));
+    const message = details
+      ? `Starting ${operation}: ${details}`
+      : `Starting ${operation}`;
+    this.info(this.formatMessage("info", message, "🚀"));
   }
 
   operationSuccess(operation: string, details?: string): void {
-    const message = details ? `${operation} completed successfully: ${details}` : `${operation} completed successfully`;
+    const message = details
+      ? `${operation} completed successfully: ${details}`
+      : `${operation} completed successfully`;
     this.success(message);
   }
 
@@ -204,14 +222,14 @@ export class Logger {
   }
 
   sectionHeader(title: string): void {
-    if (this.shouldLog('info')) {
+    if (this.shouldLog("info")) {
       console.log(`\n${title}`);
       console.log("─".repeat(title.length));
     }
   }
 
   summary(data: Record<string, any>): void {
-    if (this.shouldLog('info')) {
+    if (this.shouldLog("info")) {
       console.log("\n📊 Summary:");
       for (const [key, value] of Object.entries(data)) {
         console.log(`   ${key}: ${value}`);
@@ -233,11 +251,15 @@ export const logInfo = (message: string) => logger.info(message);
 export const logWarning = (message: string) => logger.warn(message);
 export const logError = (message: string) => logger.error(message);
 export const logSuccess = (message: string) => logger.success(message);
-export const logOperationStart = (operation: string, details?: string) => logger.operationStart(operation, details);
-export const logOperationSuccess = (operation: string, details?: string) => logger.operationSuccess(operation, details);
-export const logOperationFailure = (operation: string, error: Error | string) => logger.operationFailure(operation, error);
+export const logOperationStart = (operation: string, details?: string) =>
+  logger.operationStart(operation, details);
+export const logOperationSuccess = (operation: string, details?: string) =>
+  logger.operationSuccess(operation, details);
+export const logOperationFailure = (operation: string, error: Error | string) =>
+  logger.operationFailure(operation, error);
 export const logSectionHeader = (title: string) => logger.sectionHeader(title);
-export const createSummaryTable = (data: Record<string, any>) => logger.summary(data);
+export const createSummaryTable = (data: Record<string, any>) =>
+  logger.summary(data);
 
 /**
  * Format utilities
@@ -286,15 +308,15 @@ export class ProgressBar {
     } else {
       this.current++;
     }
-    
+
     const percentage = Math.round((this.current / this.total) * 100);
     const filled = Math.round((this.current / this.total) * 20);
     const bar = "█".repeat(filled) + "░".repeat(20 - filled);
-    
+
     process.stdout.write(
-      `\r${this.message} [${bar}] ${percentage}% (${this.current}/${this.total})`
+      `\r${this.message} [${bar}] ${percentage}% (${this.current}/${this.total})`,
     );
-    
+
     if (this.current === this.total) {
       process.stdout.write("\n");
     }
@@ -318,18 +340,22 @@ export const runWithRetry = retryWithBackoff;
  * Get agent instance with error handling
  */
 export async function getAgentInstance(): Promise<Agent> {
-  return withErrorHandling(
-    () => getAgent(),
-    "Failed to create agent"
-  );
+  return withErrorHandling(() => getAgent(), "Failed to create agent");
 }
 
 export async function getAgent(): Promise<Agent> {
   if (!agentInstance) {
     agentInstance = await Agent.createFromEnv({
       dbPath: (inboxId) =>
-        process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-        ".xmtp/" + `cli-${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+        `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "."}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+      codecs: [
+        new MarkdownCodec(),
+        new ReactionCodec(),
+        new ReplyCodec(),
+        new RemoteAttachmentCodec(),
+        new AttachmentCodec(),
+        new WalletSendCallsCodec(),
+      ],
     });
   }
   return agentInstance;
@@ -339,17 +365,23 @@ export async function getAgent(): Promise<Agent> {
  */
 export function validateAgent(agent: Agent): void {
   if (!agent) {
-    throw createError("Agent instance is null or undefined", "Agent validation");
+    throw createError(
+      "Agent instance is null or undefined",
+      "Agent validation",
+    );
   }
-  
+
   if (!agent.client) {
     throw createError("Agent client is null or undefined", "Agent validation");
   }
-  
+
   if (!agent.client.inboxId) {
-    throw createError("Agent inbox ID is null or undefined", "Agent validation");
+    throw createError(
+      "Agent inbox ID is null or undefined",
+      "Agent validation",
+    );
   }
-  
+
   logger.success(`Agent created: ${agent.client.inboxId}`);
 }
 
@@ -368,29 +400,28 @@ export async function getValidatedAgent(): Promise<Agent> {
 export async function checkGroupPermissions(
   agent: Agent,
   groupId: string,
-  requiredRole: 'admin' | 'super-admin' = 'admin'
+  requiredRole: "admin" | "super-admin" = "admin",
 ): Promise<boolean> {
-  return withErrorHandling(
-    async () => {
-      const group = await agent.client.conversations.getConversationById(groupId);
-      if (!group) {
-        throw createError(`Group not found: ${groupId}`, "Group permissions check");
-      }
-      
-      const currentUser = agent.client.inboxId;
-      
-      if (requiredRole === 'super-admin') {
-        return await (group as any).isSuperAdmin(currentUser);
-      } else {
-        return await (group as any).isAdmin(currentUser);
-      }
-    },
-    "Failed to check group permissions"
-  );
+  return withErrorHandling(async () => {
+    const group = await agent.client.conversations.getConversationById(groupId);
+    if (!group) {
+      throw createError(
+        `Group not found: ${groupId}`,
+        "Group permissions check",
+      );
+    }
+
+    const currentUser = agent.client.inboxId;
+
+    if (requiredRole === "super-admin") {
+      return await (group as any).isSuperAdmin(currentUser);
+    } else {
+      return await (group as any).isAdmin(currentUser);
+    }
+  }, "Failed to check group permissions");
 }
 
 let agentInstance: Agent | null = null;
-
 
 // Type definitions for inbox data
 export interface InboxData {
@@ -401,12 +432,12 @@ export interface InboxData {
   installations: number;
 }
 
-const typedInboxes2 = newInboxes2 as InboxData[]; 
+const typedInboxes2 = newInboxes2 as InboxData[];
 
 function getInboxByInstallationCount(installationCount: number, index: number) {
   if (installationCount === 2) {
     return typedInboxes2.slice(0, index);
-  } 
+  }
   return typedInboxes2;
 }
 

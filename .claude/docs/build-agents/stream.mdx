@@ -6,18 +6,18 @@ With the agent-sdk, you can listen for different types of messages using event h
 
 ```js [Node]
 // Listen for text messages
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   console.log(`New text message: ${ctx.message.content}`);
-  await ctx.sendText('Got your message!');
+  await ctx.sendText("Got your message!");
 });
 
 // Listen for reactions
-agent.on('reaction', async (ctx) => {
+agent.on("reaction", async (ctx) => {
   console.log(`New reaction: ${ctx.message.content}`);
 });
 
 // Listen for replies
-agent.on('reply', async (ctx) => {
+agent.on("reply", async (ctx) => {
   console.log(`New reply: ${ctx.message.content}`);
 });
 ```
@@ -25,11 +25,11 @@ agent.on('reply', async (ctx) => {
 ## Stream all messages
 
 ```js [Node]
-import { filter } from '@xmtp/agent-sdk';
+import { filter } from "@xmtp/agent-sdk";
 
 const agent = await Agent.createFromEnv();
 
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   // Filter for specific message types
   if (filter.isText(ctx.message)) {
     await ctx.sendText(`Echo: ${ctx.message.content}`);
@@ -37,7 +37,7 @@ agent.on('message', async (ctx) => {
 });
 
 // Listen for unknown messages
-agent.on('unknownMessage', (ctx) => {
+agent.on("unknownMessage", (ctx) => {
   // handle the unknown message
 });
 ```
@@ -54,14 +54,14 @@ You can listen to new conversations using the `dm` and `group` events.
 
 ```js [Node]
 // Listen to new conversations
-agent.on('dm', async (ctx) => {
+agent.on("dm", async (ctx) => {
   // received when you create a new dm
-  console.log('New dm created:', ctx.conversation.id);
+  console.log("New dm created:", ctx.conversation.id);
 });
 
-agent.on('group', async (ctx) => {
+agent.on("group", async (ctx) => {
   // received when you create a new group
-  console.log('Added to group:', ctx.conversation.id);
+  console.log("Added to group:", ctx.conversation.id);
 });
 ```
 
@@ -71,7 +71,7 @@ The agent-sdk automatically handles connection failures and reconnections. You c
 
 ```js [Node]
 // Handle uncaught errors
-agent.on('unhandledError', (error) => {
+agent.on("unhandledError", (error) => {
   console.error(`Agent error: ${error}`);
   // Handle the error appropriately
 });

@@ -11,7 +11,7 @@ Once you have the verified identities, create a new group chat. The maximum grou
 ```js [Node]
 const group = await agent.createGroupWithAddresses(
   [bo.address, caro.address],
-  createGroupOptions /* optional */
+  createGroupOptions /* optional */,
 );
 ```
 
@@ -20,7 +20,7 @@ const group = await agent.createGroupWithAddresses(
 ```js [Node]
 const group = await agent.client.conversations.newGroup(
   [bo.inboxId, caro.inboxId],
-  createGroupOptions /* optional */
+  createGroupOptions /* optional */,
 );
 ```
 
@@ -44,9 +44,9 @@ const dm = await agent.client.conversations.newDm(bo.inboxId);
 ### Get the address of the sender
 
 ```ts [Node]
-import { getTestUrl } from '@xmtp/agent-sdk/debug';
+import { getTestUrl } from "@xmtp/agent-sdk/debug";
 
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const senderAddress = ctx.getSenderAddress();
   console.log(`Message from: ${senderAddress}`);
 });
@@ -74,14 +74,14 @@ const dmByInboxId =
 The first step to creating a conversation is to verify that participants' identities are reachable on XMTP. The `canMessage` method checks each identity's compatibility, returning a response indicating whether each identity can receive messages.
 
 ```js [Node]
-import { Agent, IdentifierKind } from '@xmtp/agent-sdk';
+import { Agent, IdentifierKind } from "@xmtp/agent-sdk";
 
 const agent = await Agent.createFromEnv();
 
 // response is a Map of string (identifier) => boolean (is reachable)
 const response = await agent.client.canMessage([
   {
-    identifier: '0xcaroAddress',
+    identifier: "0xcaroAddress",
     identifierKind: IdentifierKind.Ethereum,
   },
 ]);

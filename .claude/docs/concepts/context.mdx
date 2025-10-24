@@ -9,7 +9,7 @@ Every XMTP agent event handler receives a rich `MessageContext` object that prov
 Use type guards to safely access different content types:
 
 ```typescript
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   if (ctx.isText()) {
     // ctx.message.content is now typed as string
     console.log(`Text message: ${ctx.message.content}`);
@@ -33,7 +33,7 @@ agent.on('message', async (ctx) => {
 Access message properties directly:
 
 ```typescript
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   const message = ctx.message;
 
   console.log(`Message ID: ${message.id}`);
@@ -48,12 +48,12 @@ agent.on('message', async (ctx) => {
 Send messages and replies:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   // Send a regular message
-  await ctx.sendText('Hello!');
+  await ctx.sendText("Hello!");
 
   // Send a reply to the current message
-  await ctx.sendTextReply('Thanks for your message!');
+  await ctx.sendTextReply("Thanks for your message!");
 });
 ```
 
@@ -62,13 +62,13 @@ agent.on('text', async (ctx) => {
 Add reactions to messages:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const content = ctx.message.content.toLowerCase();
 
-  if (content.includes('good')) {
-    await ctx.sendReaction('👍');
-  } else if (content.includes('bad')) {
-    await ctx.sendReaction('👎');
+  if (content.includes("good")) {
+    await ctx.sendReaction("👍");
+  } else if (content.includes("bad")) {
+    await ctx.sendReaction("👎");
   }
 });
 ```
@@ -78,13 +78,13 @@ agent.on('text', async (ctx) => {
 Get the Ethereum address of the message sender:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const senderAddress = await ctx.getSenderAddress();
   console.log(`Message from: ${senderAddress}`);
 
   // Use for authorization
-  if (senderAddress === '0x1234...') {
-    await ctx.sendTextReply('Hello, admin!');
+  if (senderAddress === "0x1234...") {
+    await ctx.sendTextReply("Hello, admin!");
   }
 });
 ```
@@ -94,7 +94,7 @@ agent.on('text', async (ctx) => {
 Get the Ethereum address of your agent:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const agentAddress = ctx.getClientAddress();
   console.log(`Agent address: ${agentAddress}`);
 });
@@ -105,7 +105,7 @@ agent.on('text', async (ctx) => {
 ### Conversation operations
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const conversation = ctx.conversation;
 
   // Get conversation members
@@ -126,7 +126,7 @@ agent.on('text', async (ctx) => {
 Check conversation consent states:
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   if (ctx.isAllowed) {
     console.log(`Messages allowed in this conversation`);
   } else if (ctx.isDenied) {
@@ -140,7 +140,7 @@ agent.on('text', async (ctx) => {
 ### Member information
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   const members = await ctx.conversation.members();
 
   for (const member of members) {
@@ -150,7 +150,7 @@ agent.on('text', async (ctx) => {
 
     // Get Ethereum address
     const ethIdentifier = member.accountIdentifiers.find(
-      (id) => id.identifierKind === IdentifierKind.Ethereum
+      (id) => id.identifierKind === IdentifierKind.Ethereum,
     );
 
     if (ethIdentifier) {
@@ -163,7 +163,7 @@ agent.on('text', async (ctx) => {
 ### Message history
 
 ```typescript
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   // Get all messages
   const messages = await ctx.conversation.messages();
   console.log(`Total messages: ${messages.length}`);
@@ -182,7 +182,7 @@ agent.on('text', async (ctx) => {
 ### address
 
 ```typescript
-agent.on('start', () => {
+agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗 ${getTestUrl(agent.client)}`);

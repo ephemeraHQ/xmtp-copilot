@@ -52,24 +52,36 @@ export function validateEncryptionKey(encryptionKey: string): boolean {
  * Validate environment name
  */
 export function validateEnvironment(env: string): boolean {
-  return ['local', 'dev', 'production'].includes(env.toLowerCase());
+  return ["local", "dev", "production"].includes(env.toLowerCase());
 }
 
 /**
  * Validate positive integer
  */
-export function validatePositiveInteger(value: number, fieldName: string): void {
+export function validatePositiveInteger(
+  value: number,
+  fieldName: string,
+): void {
   if (!Number.isInteger(value) || value <= 0) {
-    throw createError(`${fieldName} must be a positive integer, got: ${value}`, "Validation");
+    throw createError(
+      `${fieldName} must be a positive integer, got: ${value}`,
+      "Validation",
+    );
   }
 }
 
 /**
  * Validate non-negative integer
  */
-export function validateNonNegativeInteger(value: number, fieldName: string): void {
+export function validateNonNegativeInteger(
+  value: number,
+  fieldName: string,
+): void {
   if (!Number.isInteger(value) || value < 0) {
-    throw createError(`${fieldName} must be a non-negative integer, got: ${value}`, "Validation");
+    throw createError(
+      `${fieldName} must be a non-negative integer, got: ${value}`,
+      "Validation",
+    );
   }
 }
 
@@ -97,40 +109,71 @@ export function validateUrl(url: string): boolean {
 /**
  * Validate comma-separated list
  */
-export function validateCommaSeparatedList(value: string, validator: (item: string) => boolean): string[] {
-  const items = value.split(',').map(item => item.trim()).filter(item => item.length > 0);
-  
+export function validateCommaSeparatedList(
+  value: string,
+  validator: (item: string) => boolean,
+): string[] {
+  const items = value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+
   for (const item of items) {
     if (!validator(item)) {
       throw createError(`Invalid item in list: ${item}`, "List validation");
     }
   }
-  
+
   return items;
 }
 
 /**
  * Validate that at least one of the provided values is set
  */
-export function validateAtLeastOne(values: Record<string, any>, fieldNames: string[]): void {
-  const hasValue = fieldNames.some(name => values[name] !== undefined && values[name] !== null && values[name] !== '');
-  
+export function validateAtLeastOne(
+  values: Record<string, any>,
+  fieldNames: string[],
+): void {
+  const hasValue = fieldNames.some(
+    (name) =>
+      values[name] !== undefined &&
+      values[name] !== null &&
+      values[name] !== "",
+  );
+
   if (!hasValue) {
-    throw createError(`At least one of the following must be provided: ${fieldNames.join(', ')}`, "Validation");
+    throw createError(
+      `At least one of the following must be provided: ${fieldNames.join(", ")}`,
+      "Validation",
+    );
   }
 }
 
 /**
  * Validate that exactly one of the provided values is set
  */
-export function validateExactlyOne(values: Record<string, any>, fieldNames: string[]): void {
-  const setValues = fieldNames.filter(name => values[name] !== undefined && values[name] !== null && values[name] !== '');
-  
+export function validateExactlyOne(
+  values: Record<string, any>,
+  fieldNames: string[],
+): void {
+  const setValues = fieldNames.filter(
+    (name) =>
+      values[name] !== undefined &&
+      values[name] !== null &&
+      values[name] !== "",
+  );
+
   if (setValues.length === 0) {
-    throw createError(`Exactly one of the following must be provided: ${fieldNames.join(', ')}`, "Validation");
+    throw createError(
+      `Exactly one of the following must be provided: ${fieldNames.join(", ")}`,
+      "Validation",
+    );
   }
-  
+
   if (setValues.length > 1) {
-    throw createError(`Only one of the following can be provided: ${fieldNames.join(', ')}`, "Validation");
+    throw createError(
+      `Only one of the following can be provided: ${fieldNames.join(", ")}`,
+      "Validation",
+    );
   }
 }

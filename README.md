@@ -151,6 +151,7 @@ yarn groups --verbose
 ## Available Commands
 
 ### Groups Management
+
 ```bash
 # Create a DM (default behavior)
 yarn groups
@@ -163,6 +164,7 @@ yarn groups create-by-address --name "Address Group" --member-addresses "0x123..
 ```
 
 ### Send Messages
+
 ```bash
 # Send single message to target
 yarn send --target 0x1234... --message "Hello!"
@@ -175,6 +177,7 @@ yarn send --group-id abc123... --message "Hello group!"
 ```
 
 ### Debug & Information
+
 ```bash
 # Get general system information
 yarn debug info
@@ -190,6 +193,7 @@ yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db68808825
 ```
 
 ### Permissions Management
+
 ```bash
 # List group members and permissions
 yarn permissions list --group-id <group-id>
@@ -199,6 +203,7 @@ yarn permissions update-permissions --group-id <group-id> --features add-member,
 ```
 
 ### Conversations
+
 ```bash
 # List conversations
 yarn conversations list
@@ -217,6 +222,7 @@ The Slack bot provides an interactive interface for all XMTP operations:
 - **Error handling** - Graceful error handling with helpful messages
 
 Start the Slack bot with:
+
 ```bash
 yarn start
 ```
