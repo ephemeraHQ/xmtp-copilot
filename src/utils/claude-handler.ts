@@ -127,9 +127,12 @@ export class ClaudeHandler {
       }, 30000);
       
       // Use spawn with proper error handling
+      // Use shell: true to resolve 'claude' from PATH
       const claudeProcess = spawn('claude', ['--print', prompt], {
         stdio: ['ignore', 'pipe', 'pipe'],
-        detached: false
+        detached: false,
+        shell: true,
+        env: { ...process.env }
       });
       
       console.log('📡 Claude CLI process spawned with PID:', claudeProcess.pid);
