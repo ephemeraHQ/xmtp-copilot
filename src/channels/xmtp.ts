@@ -1,7 +1,11 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { logDetails } from "@xmtp/agent-sdk/debug";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
+import { ContentTypeMarkdown, MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ClaudeHandler, SessionManager } from "../utils/claude-handler.js";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { ReplyCodec } from "@xmtp/content-type-reply";
+import { AttachmentCodec, RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -10,6 +14,14 @@ const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
   dbPath: (inboxId) =>
     `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "."}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+  codecs: [
+    new MarkdownCodec(),
+    new ReactionCodec(),
+    new ReplyCodec(),
+    new RemoteAttachmentCodec(),
+    new AttachmentCodec(),
+    new WalletSendCallsCodec(),
+  ],          
 });
 
 // Initialize Claude handler and session manager
