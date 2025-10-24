@@ -1,15 +1,25 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { logDetails } from "@xmtp/agent-sdk/debug";
 import { ClaudeHandler, SessionManager } from "../utils/claude-handler.js";
+import { mkdirSync } from "fs";
+import { join, dirname } from "path";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== 'production') process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  dbPath: (inboxId) =>  
-    process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-    ".xmtp/" + `cli-${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+  dbPath: (inboxId) => {
+    const dbFileName = `cli-${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`;
+    const dbPath = process.env.RAILWAY_VOLUME_MOUNT_PATH 
+      ? join(process.env.RAILWAY_VOLUME_MOUNT_PATH, dbFileName)
+      : join(".xmtp", dbFileName);
+    
+    // Ensure the directory exists
+    mkdirSync(dirname(dbPath), { recursive: true });
+    
+    return dbPath;
+  },
 });
 
 // Initialize Claude handler and session manager
