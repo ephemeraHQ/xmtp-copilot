@@ -30,11 +30,11 @@ After importing the package, you can register the codec.
 import {
   ContentTypeMarkdown,
   MarkdownCodec,
-} from '@xmtp/content-type-markdown';
+} from "@xmtp/content-type-markdown";
 
 // Create the XMTP agent
 const agent = await Agent.create(signer, {
-  env: 'dev',
+  env: "dev",
   codecs: [new MarkdownCodec()],
 });
 ```
@@ -133,10 +133,10 @@ await ctx.conversation.send(content, ContentTypeMarkdown);
 ## Receive markdown content
 
 ```tsx [Node]
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   if (ctx.usesCodec(MarkdownCodec)) {
     const markdownContent = ctx.message.content;
-    console.log('Received markdown:', markdownContent);
+    console.log("Received markdown:", markdownContent);
 
     // Process the markdown content
     // You can parse it, extract data, or display it formatted

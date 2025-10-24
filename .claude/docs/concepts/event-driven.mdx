@@ -24,33 +24,33 @@ Subscribe only to what you need using Node’s `EventEmitter` interface. Events 
 
 ```ts
 // Listen to specific message types
-agent.on('text', async (ctx) => {
+agent.on("text", async (ctx) => {
   console.log(`Text message: ${ctx.message.content}`);
 });
 
-agent.on('reaction', async (ctx) => {
+agent.on("reaction", async (ctx) => {
   console.log(`Reaction: ${ctx.message.content}`);
 });
 
-agent.on('reply', async (ctx) => {
+agent.on("reply", async (ctx) => {
   console.log(`Reply to: ${ctx.message.content.reference}`);
 });
 
 // Listen to new conversations
-agent.on('dm', async (ctx) => {
-  await ctx.conversation.send('Welcome to our DM!');
+agent.on("dm", async (ctx) => {
+  await ctx.conversation.send("Welcome to our DM!");
 });
 
-agent.on('group', async (ctx) => {
-  await ctx.conversation.send('Hello group!');
+agent.on("group", async (ctx) => {
+  await ctx.conversation.send("Hello group!");
 });
 
 // Listen to unhandled events
-agent.on('unhandledError', (error) => {
+agent.on("unhandledError", (error) => {
   console.error(`Agent error: ${error}`);
 });
 
-agent.on('unknownMessage', (ctx) => {
+agent.on("unknownMessage", (ctx) => {
   // handle the unknown message
 });
 ```
@@ -64,11 +64,11 @@ The `"message"` event fires for **every** incoming message, regardless of type. 
 ## Best practice example
 
 ```ts
-import { filter } from '@xmtp/agent-sdk';
+import { filter } from "@xmtp/agent-sdk";
 
 const agent = await Agent.createFromEnv();
 
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   // Filter for specific message types
   if (filter.isText(ctx.message)) {
     await ctx.sendText(`Echo: ${ctx.message.content}`);

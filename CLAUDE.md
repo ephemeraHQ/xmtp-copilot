@@ -1,7 +1,8 @@
 # XMTP Copilot
 
 RULES:
-- You are a helpful assistant that can help me with XMTP tasks. 
+
+- You are a helpful assistant that can help me with XMTP tasks.
 - You can also answer questions based on the Docs in the .claude/docs folder.
 - If the user poses a question, probably is looking for a Docs answer.
 - Don't send "Note:...". Only answer when the user asks for it.
@@ -22,7 +23,7 @@ yarn groups --members 5 --name "My Group"
 
 ## Use repeat tasks for multiple DMs
 yarn groups --repeat 3
-yarn groups create 
+yarn groups create
 
 ## Create group by inbox ID
 yarn groups create --name "My Group" --members 5
@@ -96,12 +97,6 @@ yarn list messages --conversation-id <conversation-id> --limit 10
 yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
 
 
-# Installations Management
-
-## Get installation information for an inbox
-yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-
-
 # Debug & Information
 
 ## Get general system information
@@ -121,8 +116,34 @@ yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c
 
 ## Get installation information for an inbox
 yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+
+
+# Content Types
+
+## Send text message with reply and reaction
+yarn content text --target 0x1234...
+
+## Send markdown formatted message
+yarn content markdown --target 0x1234...
+
+## Send remote attachment
+yarn content attachment --target 0x1234...
+
+## Send transaction frame (USDC)
+yarn content transaction --target 0x1234... --amount 0.5
+
+## Send deeplink to create conversation
+yarn content deeplink --target 0x1234...
+
+## Send mini app URL
+yarn content miniapp --target 0x1234...
+
+## Send content to a group
+yarn content text --group-id <group-id>
+yarn content markdown --group-id <group-id>
+
+## Test content types with repeat
+yarn content text --target 0x1234... --repeat 3 --delay 1000
 ```
 
-
 Nothing else. Be helpful and friendly.
-

@@ -1,25 +1,19 @@
-import {
-  IdentifierKind,
-  type Group,
-} from "@xmtp/node-sdk";
+import { IdentifierKind, type Group } from "@xmtp/node-sdk";
 import "dotenv/config";
 import { getInboxes } from "../core/agent";
-import { 
-  parseStandardArgs, 
-  generateHelpText, 
+import {
+  parseStandardArgs,
+  generateHelpText,
   type StandardCliParams,
 } from "../cli/cli-params";
-import { 
-  getAgentInstance, 
+import {
+  getAgentInstance,
   logOperationStart,
   logOperationSuccess,
   logOperationFailure,
-  logSectionHeader
+  logSectionHeader,
 } from "../core/agent";
-import { 
-  validateEthereumAddress,
-  validateGroupId,
-} from "../utils/validation";
+import { validateEthereumAddress, validateGroupId } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
@@ -37,52 +31,54 @@ interface Config extends StandardCliParams {
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ['create', 'create-by-address', 'metadata'],
-      type: 'string' as const,
-      description: 'Operation to perform',
+      flags: ["create", "create-by-address", "metadata"],
+      type: "string" as const,
+      description: "Operation to perform",
       required: true,
     },
     groupName: {
-      flags: ['--group-name', '--name'],
-      type: 'string' as const,
-      description: 'Group name for group operations',
+      flags: ["--group-name", "--name"],
+      type: "string" as const,
+      description: "Group name for group operations",
       required: false,
     },
     groupDescription: {
-      flags: ['--group-desc', '--description'],
-      type: 'string' as const,
-      description: 'Group description',
+      flags: ["--group-desc", "--description"],
+      type: "string" as const,
+      description: "Group description",
       required: false,
     },
     members: {
-      flags: ['--members'],
-      type: 'number' as const,
-      description: 'Number of random members for groups (default: 1, creates DM)',
+      flags: ["--members"],
+      type: "number" as const,
+      description:
+        "Number of random members for groups (default: 1, creates DM)",
       required: false,
       defaultValue: 1,
     },
     targetAddress: {
-      flags: ['--target'],
-      type: 'string' as const,
-      description: 'Target address to invite to group',
+      flags: ["--target"],
+      type: "string" as const,
+      description: "Target address to invite to group",
       required: false,
     },
     imageUrl: {
-      flags: ['--image-url'],
-      type: 'string' as const,
-      description: 'New group image URL for metadata operations',
+      flags: ["--image-url"],
+      type: "string" as const,
+      description: "New group image URL for metadata operations",
       required: false,
     },
     memberAddresses: {
-      flags: ['--member-addresses'],
-      type: 'string' as const,
-      description: 'Comma-separated list of Ethereum addresses for group members',
+      flags: ["--member-addresses"],
+      type: "string" as const,
+      description:
+        "Comma-separated list of Ethereum addresses for group members",
       required: false,
     },
   };
 
   const examples = [
-    'yarn groups',
+    "yarn groups",
     'yarn groups --name "My DM"',
     'yarn groups --members 5 --name "My Group"',
     'yarn groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."',
@@ -90,18 +86,20 @@ function showHelp() {
     'yarn groups metadata --group-id <group-id> --image-url "https://example.com/image.jpg"',
   ];
 
-  console.log(generateHelpText(
-    'XMTP groups - Create DMs and Groups',
-    'Create direct message conversations (default), groups with members, retrieve group data, and update group metadata',
-    'yarn groups [operation] [options]',
-    customParams,
-    examples
-  ));
+  console.log(
+    generateHelpText(
+      "XMTP groups - Create DMs and Groups",
+      "Create direct message conversations (default), groups with members, retrieve group data, and update group metadata",
+      "yarn groups [operation] [options]",
+      customParams,
+      examples,
+    ),
+  );
 }
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
-  
+
   // Handle help
   if (args.includes("--help") || args.includes("-h")) {
     showHelp();
@@ -111,7 +109,7 @@ function parseArgs(): Config {
   // Extract operation from first argument if not a flag
   let operation = "create";
   let remainingArgs = args;
-  
+
   if (args.length > 0 && !args[0].startsWith("--")) {
     operation = args[0];
     remainingArgs = args.slice(1);
@@ -119,40 +117,42 @@ function parseArgs(): Config {
 
   const customParams = {
     groupName: {
-      flags: ['--group-name', '--name'],
-      type: 'string' as const,
-      description: 'Group name for group operations',
+      flags: ["--group-name", "--name"],
+      type: "string" as const,
+      description: "Group name for group operations",
       required: false,
     },
     groupDescription: {
-      flags: ['--group-desc', '--description'],
-      type: 'string' as const,
-      description: 'Group description',
+      flags: ["--group-desc", "--description"],
+      type: "string" as const,
+      description: "Group description",
       required: false,
     },
     members: {
-      flags: ['--members'],
-      type: 'number' as const,
-      description: 'Number of random members for groups (default: 1, creates DM)',
+      flags: ["--members"],
+      type: "number" as const,
+      description:
+        "Number of random members for groups (default: 1, creates DM)",
       required: false,
       defaultValue: 1,
     },
     targetAddress: {
-      flags: ['--target'],
-      type: 'string' as const,
-      description: 'Target address to invite to group',
+      flags: ["--target"],
+      type: "string" as const,
+      description: "Target address to invite to group",
       required: false,
     },
     imageUrl: {
-      flags: ['--image-url'],
-      type: 'string' as const,
-      description: 'New group image URL for metadata operations',
+      flags: ["--image-url"],
+      type: "string" as const,
+      description: "New group image URL for metadata operations",
       required: false,
     },
     memberAddresses: {
-      flags: ['--member-addresses'],
-      type: 'string' as const,
-      description: 'Comma-separated list of Ethereum addresses for group members',
+      flags: ["--member-addresses"],
+      type: "string" as const,
+      description:
+        "Comma-separated list of Ethereum addresses for group members",
       required: false,
     },
   };
@@ -164,17 +164,19 @@ function parseArgs(): Config {
   if (config.targetAddress && !validateEthereumAddress(config.targetAddress)) {
     throw new Error(`Invalid target address: ${config.targetAddress}`);
   }
-  
+
   if (config.groupId && !validateGroupId(config.groupId)) {
     throw new Error(`Invalid group ID: ${config.groupId}`);
   }
 
   // Validate member addresses if provided
   if (config.memberAddresses) {
-    const addressString = Array.isArray(config.memberAddresses) 
-      ? config.memberAddresses.join(',') 
+    const addressString = Array.isArray(config.memberAddresses)
+      ? config.memberAddresses.join(",")
       : config.memberAddresses;
-    const addresses = addressString.split(',').map((addr: string) => addr.trim());
+    const addresses = addressString
+      .split(",")
+      .map((addr: string) => addr.trim());
     for (const address of addresses) {
       if (!validateEthereumAddress(address)) {
         throw new Error(`Invalid member address: ${address}`);
@@ -186,12 +188,13 @@ function parseArgs(): Config {
   return config;
 }
 
-
-
 // Operation: Create Group (by inbox ID)
 async function runCreateOperation(config: Config): Promise<void> {
   const members = config.members ?? 1;
-  logOperationStart(members === 1 ? "DM Creation" : "Group Creation", `Creating ${members === 1 ? 'DM' : 'group'} with ${members} members`);
+  logOperationStart(
+    members === 1 ? "DM Creation" : "Group Creation",
+    `Creating ${members === 1 ? "DM" : "group"} with ${members} members`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -201,9 +204,14 @@ async function runCreateOperation(config: Config): Promise<void> {
   console.log(`📋 Using ${memberInboxIds.length} existing inbox IDs`);
 
   // Set up group options
-  const groupName = config.groupName || (members === 1 ? `DM ${Date.now()}` : `Test Group ${Date.now()}`);
+  const groupName =
+    config.groupName ||
+    (members === 1 ? `DM ${Date.now()}` : `Test Group ${Date.now()}`);
   const groupDescription =
-    config.groupDescription || (members === 1 ? "DM created by XMTP groups CLI" : "Group created by XMTP groups CLI");
+    config.groupDescription ||
+    (members === 1
+      ? "DM created by XMTP groups CLI"
+      : "Group created by XMTP groups CLI");
 
   if (members === 1) {
     console.log(`💬 Creating DM: "${groupName}"`);
@@ -214,13 +222,10 @@ async function runCreateOperation(config: Config): Promise<void> {
 
   try {
     // Create group with existing inbox IDs
-    const group = (await agent.client.conversations.newGroup(
-      memberInboxIds,
-      {
-        groupName,
-        groupDescription,
-      },
-    )) as Group;
+    const group = (await agent.client.conversations.newGroup(memberInboxIds, {
+      groupName,
+      groupDescription,
+    })) as Group;
 
     console.log(`✅ Group created with ID: ${group.id}`);
 
@@ -266,18 +271,22 @@ async function runCreateOperation(config: Config): Promise<void> {
     }
 
     // Send welcome message
-    const welcomeMessage = members === 1 
-      ? `Hello! This DM was created by the XMTP groups CLI.`
-      : `Welcome to ${groupName}! This group was created by the XMTP groups CLI with ${groupMembers.length} members.`;
+    const welcomeMessage =
+      members === 1
+        ? `Hello! This DM was created by the XMTP groups CLI.`
+        : `Welcome to ${groupName}! This group was created by the XMTP groups CLI with ${groupMembers.length} members.`;
     await group.send(welcomeMessage);
     console.log(`💬 Sent welcome message`);
 
     logOperationSuccess(members === 1 ? "DM Creation" : "Group Creation");
     console.log(
-      `   ${members === 1 ? 'DM' : 'Group'} can be accessed at: https://xmtp.chat/conversations/${group.id}`,
+      `   ${members === 1 ? "DM" : "Group"} can be accessed at: https://xmtp.chat/conversations/${group.id}`,
     );
   } catch (error) {
-    logOperationFailure(members === 1 ? "DM Creation" : "Group Creation", error as Error);
+    logOperationFailure(
+      members === 1 ? "DM Creation" : "Group Creation",
+      error as Error,
+    );
     return;
   }
 }
@@ -285,14 +294,19 @@ async function runCreateOperation(config: Config): Promise<void> {
 // Operation: Create Group by Address
 async function runCreateByAddressOperation(config: Config): Promise<void> {
   if (!config.memberAddresses || config.memberAddresses.length === 0) {
-    console.error(`❌ Error: --member-addresses is required for create-by-address operation`);
+    console.error(
+      `❌ Error: --member-addresses is required for create-by-address operation`,
+    );
     console.log(
       `   Usage: yarn groups create-by-address --name <name> --member-addresses "0x123...,0x456..."`,
     );
     return;
   }
 
-  logOperationStart("Group Creation by Address", `Creating group with ${config.memberAddresses.length} member addresses`);
+  logOperationStart(
+    "Group Creation by Address",
+    `Creating group with ${config.memberAddresses.length} member addresses`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -300,7 +314,8 @@ async function runCreateByAddressOperation(config: Config): Promise<void> {
   // Set up group options
   const groupName = config.groupName || `Address Group ${Date.now()}`;
   const groupDescription =
-    config.groupDescription || "Group created by XMTP groups CLI using addresses";
+    config.groupDescription ||
+    "Group created by XMTP groups CLI using addresses";
 
   console.log(`👥 Creating group: "${groupName}"`);
   console.log(`📝 Description: "${groupDescription}"`);
@@ -309,7 +324,9 @@ async function runCreateByAddressOperation(config: Config): Promise<void> {
   try {
     // Create group with Ethereum addresses
     const group = (await agent.createGroupWithAddresses(
-      config.memberAddresses.map((address) => address as `0x${string}`) as `0x${string}`[],
+      config.memberAddresses.map(
+        (address) => address as `0x${string}`,
+      ) as `0x${string}`[],
       {
         groupName,
         groupDescription,
@@ -425,35 +442,45 @@ async function runMetadataOperation(config: Config): Promise<void> {
   }
 }
 
-
 /**
  * Check if CLI manager should be used and handle execution
  */
 async function handleCliManagerExecution(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   // Check if CLI manager parameters are present
-  const hasManagerArgs = args.some(arg => 
-    arg === '--repeat' || arg === '--delay' || arg === '--continue-on-error' || arg === '--verbose'
+  const hasManagerArgs = args.some(
+    (arg) =>
+      arg === "--repeat" ||
+      arg === "--delay" ||
+      arg === "--continue-on-error" ||
+      arg === "--verbose",
   );
-  
+
   if (!hasManagerArgs) {
     // No manager args, run normally
     await main();
     return;
   }
-  
+
   // Parse manager configuration
-  const {   skillArgs, config: managerConfig } = CliManager.parseManagerArgs(args);
-  
+  const { skillArgs, config: managerConfig } =
+    CliManager.parseManagerArgs(args);
+
   if (managerConfig.repeat && managerConfig.repeat > 1) {
-    console.log(`🔄 CLI Manager: Executing groups command ${managerConfig.repeat} time(s)`);
-    
+    console.log(
+      `🔄 CLI Manager: Executing groups command ${managerConfig.repeat} time(s)`,
+    );
+
     const manager = new CliManager(managerConfig);
-    const results = await manager.executeYarnCommand('groups', skillArgs, managerConfig);
-    
+    const results = await manager.executeYarnCommand(
+      "groups",
+      skillArgs,
+      managerConfig,
+    );
+
     // Exit with error code if any execution failed
-    const hasFailures = results.some(r => !r.success);
+    const hasFailures = results.some((r) => !r.success);
     process.exit(hasFailures ? 1 : 0);
   } else {
     // Single execution with manager args but no repeat

@@ -15,7 +15,7 @@ Middleware functions receive a `ctx` (context) object and a `next` function. Nor
 ### Example
 
 ```ts
-import { Agent, AgentMiddleware, filter } from '@xmtp/agent-sdk';
+import { Agent, AgentMiddleware, filter } from "@xmtp/agent-sdk";
 
 const onlyText: AgentMiddleware = async (ctx, next) => {
   if (filter.isText(ctx.message)) {

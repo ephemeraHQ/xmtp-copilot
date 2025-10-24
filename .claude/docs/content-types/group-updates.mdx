@@ -9,7 +9,7 @@ The `group_updated` content type is a native XMTP content type, so no additional
 ## Listen for group updates
 
 ```typescript
-on('group-update', async (ctx) => {
+on("group-update", async (ctx) => {
   // handle the group update
   console.log(`Group updated: ${JSON.stringify(ctx.message.content)}`);
 });
@@ -40,16 +40,16 @@ on('group-update', async (ctx) => {
 ### Monitor group name changes
 
 ```tsx
-on('group-update', async (ctx) => {
+on("group-update", async (ctx) => {
   const content = ctx.message.content as any;
 
   const nameChange = content.metadataFieldChanges?.find(
-    (change) => change.fieldName === 'group_name'
+    (change) => change.fieldName === "group_name",
   );
 
   if (nameChange) {
     console.log(
-      `Group renamed: ${nameChange.oldValue} → ${nameChange.newValue}`
+      `Group renamed: ${nameChange.oldValue} → ${nameChange.newValue}`,
     );
   }
 });
@@ -58,7 +58,7 @@ on('group-update', async (ctx) => {
 ### Monitor member additions
 
 ```typescript
-on('group-update', async (ctx) => {
+on("group-update", async (ctx) => {
   const content = ctx.message.content as any;
 
   if (content.addedInboxes?.length > 0) {
@@ -70,7 +70,7 @@ on('group-update', async (ctx) => {
 ### Monitor member removals
 
 ```typescript
-on('group-update', async (ctx) => {
+on("group-update", async (ctx) => {
   const content = ctx.message.content as any;
 
   if (content.removedInboxes?.length > 0) {
@@ -82,9 +82,9 @@ on('group-update', async (ctx) => {
 ### Filter by specific group
 
 ```typescript
-const targetGroupId = 'your-group-conversation-id';
+const targetGroupId = "your-group-conversation-id";
 
-on('group-update', async (ctx) => {
+on("group-update", async (ctx) => {
   if (ctx.message.conversationId === targetGroupId) {
     console.log(`Target group updated: ${JSON.stringify(ctx.message.content)}`);
   }

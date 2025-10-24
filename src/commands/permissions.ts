@@ -1,23 +1,18 @@
-import {
-  type Group,
-  type PermissionUpdateType,
-} from "@xmtp/node-sdk";
+import { type Group, type PermissionUpdateType } from "@xmtp/node-sdk";
 import "dotenv/config";
-import { 
-  parseStandardArgs, 
-  generateHelpText, 
+import {
+  parseStandardArgs,
+  generateHelpText,
   type StandardCliParams,
 } from "../cli/cli-params";
-import { 
-  getValidatedAgent, 
+import {
+  getValidatedAgent,
   logOperationStart,
   logOperationSuccess,
   logOperationFailure,
-  logSectionHeader
+  logSectionHeader,
 } from "../core/agent";
-import { 
-  validateGroupId,
-} from "../utils/validation";
+import { validateGroupId } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
@@ -63,40 +58,42 @@ const PERMISSION_POLICIES = {
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ['list', 'info', 'update-permissions'],
-      type: 'string' as const,
-      description: 'Operation to perform',
+      flags: ["list", "info", "update-permissions"],
+      type: "string" as const,
+      description: "Operation to perform",
       required: true,
     },
     features: {
-      flags: ['--features'],
-      type: 'string' as const,
-      description: 'Comma-separated features to update',
+      flags: ["--features"],
+      type: "string" as const,
+      description: "Comma-separated features to update",
       required: false,
     },
     permissions: {
-      flags: ['--permissions'],
-      type: 'string' as const,
-      description: 'Permission type to apply',
+      flags: ["--permissions"],
+      type: "string" as const,
+      description: "Permission type to apply",
       required: false,
     },
   };
 
   const examples = [
-    'yarn permissions list --group-id <group-id>',
-    'yarn permissions info --group-id <group-id>',
-    'yarn permissions update-permissions --group-id <group-id> --features update-metadata --permissions admin-only',
-    'yarn permissions update-permissions --group-id <group-id> --features add-member,remove-member --permissions admin-only',
-    'yarn permissions update-permissions --group-id <group-id> --features update-metadata --permissions disabled',
+    "yarn permissions list --group-id <group-id>",
+    "yarn permissions info --group-id <group-id>",
+    "yarn permissions update-permissions --group-id <group-id> --features update-metadata --permissions admin-only",
+    "yarn permissions update-permissions --group-id <group-id> --features add-member,remove-member --permissions admin-only",
+    "yarn permissions update-permissions --group-id <group-id> --features update-metadata --permissions disabled",
   ];
 
-  console.log(generateHelpText(
-    'XMTP Group Permissions CLI - Flexible permission management',
-    'List group members, view group information, and update group permissions',
-    'yarn permissions <operation> [options]',
-    customParams,
-    examples
-  ));
+  console.log(
+    generateHelpText(
+      "XMTP Group Permissions CLI - Flexible permission management",
+      "List group members, view group information, and update group permissions",
+      "yarn permissions <operation> [options]",
+      customParams,
+      examples,
+    ),
+  );
 
   console.log(`
 AVAILABLE FEATURES:
@@ -118,7 +115,7 @@ For more information, see: https://docs.xmtp.org/inboxes/group-permissions
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
-  
+
   // Handle help
   if (args.includes("--help") || args.includes("-h")) {
     showHelp();
@@ -128,7 +125,7 @@ function parseArgs(): Config {
   // Extract operation from first argument if not a flag
   let operation = "list";
   let remainingArgs = args;
-  
+
   if (args.length > 0 && !args[0].startsWith("--")) {
     operation = args[0];
     remainingArgs = args.slice(1);
@@ -136,15 +133,15 @@ function parseArgs(): Config {
 
   const customParams = {
     features: {
-      flags: ['--features'],
-      type: 'string' as const,
-      description: 'Comma-separated features to update',
+      flags: ["--features"],
+      type: "string" as const,
+      description: "Comma-separated features to update",
       required: false,
     },
     permissions: {
-      flags: ['--permissions'],
-      type: 'string' as const,
-      description: 'Permission type to apply',
+      flags: ["--permissions"],
+      type: "string" as const,
+      description: "Permission type to apply",
       required: false,
     },
   };
@@ -159,15 +156,14 @@ function parseArgs(): Config {
 
   // Parse features if provided
   if (config.features) {
-    const featuresString = Array.isArray(config.features) 
-      ? config.features.join(',') 
+    const featuresString = Array.isArray(config.features)
+      ? config.features.join(",")
       : config.features;
-    config.features = featuresString.split(',').map((f: string) => f.trim());
+    config.features = featuresString.split(",").map((f: string) => f.trim());
   }
 
   return config;
 }
-
 
 // Helper function to get agent (now using shared utility)
 async function getAgentInstance() {
@@ -201,7 +197,10 @@ async function runListOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("List Members", `Listing members for group: ${config.groupId}`);
+  logOperationStart(
+    "List Members",
+    `Listing members for group: ${config.groupId}`,
+  );
 
   try {
     const group = await getGroupById(config.groupId);
@@ -268,7 +267,10 @@ async function runInfoOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("Get Group Info", `Getting detailed information for group: ${config.groupId}`);
+  logOperationStart(
+    "Get Group Info",
+    `Getting detailed information for group: ${config.groupId}`,
+  );
 
   try {
     const group = await getGroupById(config.groupId);
@@ -318,7 +320,9 @@ async function runInfoOperation(config: Config): Promise<void> {
 async function runUpdatePermissionsOperation(config: Config): Promise<void> {
   if (!config.groupId) {
     console.error("❌ Group ID is required for update-permissions operation");
-    console.log("   Usage: yarn permissions update-permissions --group-id <group-id> --features <features> --permissions <permission-type>");
+    console.log(
+      "   Usage: yarn permissions update-permissions --group-id <group-id> --features <features> --permissions <permission-type>",
+    );
     return;
   }
 
@@ -329,8 +333,13 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
   }
 
   if (!config.permissions) {
-    console.error("❌ --permissions is required for update-permissions operation");
-    console.error("   Available permissions:", AVAILABLE_PERMISSIONS.join(", "));
+    console.error(
+      "❌ --permissions is required for update-permissions operation",
+    );
+    console.error(
+      "   Available permissions:",
+      AVAILABLE_PERMISSIONS.join(", "),
+    );
     return;
   }
 
@@ -347,11 +356,17 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
   // Validate permissions
   if (!AVAILABLE_PERMISSIONS.includes(config.permissions)) {
     console.error("❌ Invalid permission type:", config.permissions);
-    console.error("   Available permissions:", AVAILABLE_PERMISSIONS.join(", "));
+    console.error(
+      "   Available permissions:",
+      AVAILABLE_PERMISSIONS.join(", "),
+    );
     return;
   }
 
-  logOperationStart("Update Permissions", `Updating permissions for group: ${config.groupId}`);
+  logOperationStart(
+    "Update Permissions",
+    `Updating permissions for group: ${config.groupId}`,
+  );
   console.log(`📋 Features: ${config.features.join(", ")}`);
   console.log(`🔑 Permission: ${config.permissions}`);
 
@@ -365,7 +380,9 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
     const isSuperAdmin = await group.isSuperAdmin(currentUser);
 
     if (!isSuperAdmin) {
-      console.error("❌ Only super admins can change group permission policies");
+      console.error(
+        "❌ Only super admins can change group permission policies",
+      );
       console.error(`   Current user: ${currentUser}`);
       console.error(`   Required role: Super Admin`);
       return;
@@ -406,19 +423,28 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
             permissionPolicy,
           );
         }
-        console.log(`   ✅ Updated ${feature} permission to ${config.permissions}`);
+        console.log(
+          `   ✅ Updated ${feature} permission to ${config.permissions}`,
+        );
         updatedCount++;
       } catch (featureError) {
-        console.log(`   ❌ Failed to update ${feature}: ${featureError instanceof Error ? featureError.message : String(featureError)}`);
+        console.log(
+          `   ❌ Failed to update ${feature}: ${featureError instanceof Error ? featureError.message : String(featureError)}`,
+        );
       }
     }
 
     if (updatedCount > 0) {
-      console.log(`\n✅ Successfully updated ${updatedCount} out of ${config.features.length} features`);
+      console.log(
+        `\n✅ Successfully updated ${updatedCount} out of ${config.features.length} features`,
+      );
       logOperationSuccess("Update Permissions");
     } else {
       console.log(`\n❌ No features were updated successfully`);
-      logOperationFailure("Update Permissions", new Error("No features were updated"));
+      logOperationFailure(
+        "Update Permissions",
+        new Error("No features were updated"),
+      );
     }
   } catch (error) {
     logOperationFailure("Update Permissions", error as Error);
@@ -431,29 +457,40 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
  */
 async function handleCliManagerExecution(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   // Check if CLI manager parameters are present
-  const hasManagerArgs = args.some(arg => 
-    arg === '--repeat' || arg === '--delay' || arg === '--continue-on-error' || arg === '--verbose'
+  const hasManagerArgs = args.some(
+    (arg) =>
+      arg === "--repeat" ||
+      arg === "--delay" ||
+      arg === "--continue-on-error" ||
+      arg === "--verbose",
   );
-  
+
   if (!hasManagerArgs) {
     // No manager args, run normally
     await main();
     return;
   }
-  
+
   // Parse manager configuration
-  const { skillArgs, config: managerConfig } = CliManager.parseManagerArgs(args);
-  
+  const { skillArgs, config: managerConfig } =
+    CliManager.parseManagerArgs(args);
+
   if (managerConfig.repeat && managerConfig.repeat > 1) {
-    console.log(`🔄 CLI Manager: Executing permissions command ${managerConfig.repeat} time(s)`);
-    
+    console.log(
+      `🔄 CLI Manager: Executing permissions command ${managerConfig.repeat} time(s)`,
+    );
+
     const manager = new CliManager(managerConfig);
-    const results = await manager.executeYarnCommand('permissions', skillArgs, managerConfig);
-    
+    const results = await manager.executeYarnCommand(
+      "permissions",
+      skillArgs,
+      managerConfig,
+    );
+
     // Exit with error code if any execution failed
-    const hasFailures = results.some(r => !r.success);
+    const hasFailures = results.some((r) => !r.success);
     process.exit(hasFailures ? 1 : 0);
   } else {
     // Single execution with manager args but no repeat

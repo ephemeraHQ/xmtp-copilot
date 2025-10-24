@@ -34,10 +34,10 @@ After importing the package, you can register the codec.
 import {
   AttachmentCodec,
   RemoteAttachmentCodec,
-} from '@xmtp/content-type-remote-attachment';
+} from "@xmtp/content-type-remote-attachment";
 // Create the XMTP agent
 const agent = await Agent.create(signer, {
-  env: 'dev',
+  env: "dev",
   codecs: [new AttachmentCodec(), new RemoteAttachmentCodec()],
 });
 ```
@@ -54,7 +54,7 @@ const data = await new Promise((resolve, reject) => {
     if (reader.result instanceof ArrayBuffer) {
       resolve(reader.result);
     } else {
-      reject(new Error('Not an ArrayBuffer'));
+      reject(new Error("Not an ArrayBuffer"));
     }
   };
   reader.readAsArrayBuffer(image);
@@ -77,7 +77,7 @@ Use `RemoteAttachmentCodec.encodeEncrypted` to encrypt an attachment:
 ```tsx [Node]
 const encryptedEncoded = await RemoteAttachmentCodec.encodeEncrypted(
   attachment,
-  new AttachmentCodec()
+  new AttachmentCodec(),
 );
 ```
 
@@ -92,7 +92,7 @@ const remoteAttachment = {
   salt: encryptedEncoded.salt,
   nonce: encryptedEncoded.nonce,
   secret: encryptedEncoded.secret,
-  scheme: 'https://',
+  scheme: "https://",
   filename: attachment.filename,
   contentLength: attachment.data.byteLength,
 };
@@ -114,12 +114,12 @@ Now that you can send a remote attachment, you need a way to receive it. For exa
 import {
   ContentTypeRemoteAttachment,
   RemoteAttachmentCodec,
-} from '@xmtp/content-type-remote-attachment';
+} from "@xmtp/content-type-remote-attachment";
 
 if (ctx.usesCodec(RemoteAttachmentCodec)) {
   const attachment = await RemoteAttachmentCodec.load(
     ctx.message.content,
-    client
+    client,
   );
 }
 ```
@@ -138,10 +138,10 @@ Once you've created the attachment object, you can create a preview to show in t
 const objectURL = URL.createObjectURL(
   new Blob([Buffer.from(attachment.data)], {
     type: attachment.mimeType,
-  })
+  }),
 );
 
-const img = document.createElement('img');
+const img = document.createElement("img");
 img.src = objectURL;
 img.title = attachment.filename;
 ```

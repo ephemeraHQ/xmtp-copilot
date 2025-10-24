@@ -7,11 +7,11 @@ import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { getAgentInstance } from "../core/agent";
-import { 
-  parseStandardArgs, 
-  generateHelpText, 
+import {
+  parseStandardArgs,
+  generateHelpText,
   validateMutuallyExclusive,
-  type StandardCliParams 
+  type StandardCliParams,
 } from "../cli/cli-params";
 import { type CliParam } from "../cli/cli-utils";
 import { CliManager } from "../cli/cli-manager";
@@ -34,120 +34,123 @@ interface Config extends StandardCliParams {
 
 function showHelp() {
   const customParams: Record<string, CliParam> = {};
-  
+
   customParams.customMessage = {
-    flags: ['--custom-message'],
-    type: 'string',
-    description: 'Custom message for individual DM messages (default: auto-generated)',
+    flags: ["--custom-message"],
+    type: "string",
+    description:
+      "Custom message for individual DM messages (default: auto-generated)",
     required: false,
   };
-  
+
   customParams.sender = {
-    flags: ['--sender'],
-    type: 'string',
-    description: 'Wallet address to use as sender (must be group member)',
+    flags: ["--sender"],
+    type: "string",
+    description: "Wallet address to use as sender (must be group member)",
     required: false,
   };
-  
+
   customParams.users = {
-    flags: ['--users'],
-    type: 'number',
-    description: 'Number of messages to send [default: 1]',
+    flags: ["--users"],
+    type: "number",
+    description: "Number of messages to send [default: 1]",
     required: false,
   };
-  
+
   customParams.attempts = {
-    flags: ['--attempts'],
-    type: 'number',
-    description: 'Number of attempts to send messages [default: 1]',
+    flags: ["--attempts"],
+    type: "number",
+    description: "Number of attempts to send messages [default: 1]",
     required: false,
   };
-  
+
   customParams.threshold = {
-    flags: ['--threshold'],
-    type: 'number',
-    description: 'Success threshold percentage [default: 95]',
+    flags: ["--threshold"],
+    type: "number",
+    description: "Success threshold percentage [default: 95]",
     required: false,
   };
-  
+
   customParams.wait = {
-    flags: ['--wait'],
-    type: 'boolean',
-    description: 'Wait for responses from target',
+    flags: ["--wait"],
+    type: "boolean",
+    description: "Wait for responses from target",
     required: false,
   };
 
   const examples = [
-    'yarn send --target 0x1234... --users 10',
-    'yarn send --target 0x1234... --users 500 --wait',
-    'yarn send --target 0x1234... --users 10 --attempts 5',
+    "yarn send --target 0x1234... --users 10",
+    "yarn send --target 0x1234... --users 500 --wait",
+    "yarn send --target 0x1234... --users 10 --attempts 5",
     'yarn send --target 0x1234... --custom-message "Hello from CLI!"',
     'yarn send --group-id abc123... --message "Hello group!" --sender 0x1234...',
-    'yarn send --target 0x1234... --users 1 --repeat 2 --delay 1000',
-    'yarn send --target 0x1234... --users 1 --repeat 5 --continue-on-error --verbose',
-    'yarn send --help',
+    "yarn send --target 0x1234... --users 1 --repeat 2 --delay 1000",
+    "yarn send --target 0x1234... --users 1 --repeat 5 --continue-on-error --verbose",
+    "yarn send --help",
   ];
 
-  console.log(generateHelpText(
-    'XMTP Send CLI - Message sending and testing',
-    'Send messages to targets or groups with testing capabilities',
-    'yarn send [options]',
-    customParams,
-    examples
-  ));
+  console.log(
+    generateHelpText(
+      "XMTP Send CLI - Message sending and testing",
+      "Send messages to targets or groups with testing capabilities",
+      "yarn send [options]",
+      customParams,
+      examples,
+    ),
+  );
 }
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
-  
+
   // Custom parameters for send skill
   const customParams: Record<string, CliParam> = {};
-  
+
   customParams.customMessage = {
-    flags: ['--custom-message'],
-    type: 'string',
-    description: 'Custom message for individual DM messages',
+    flags: ["--custom-message"],
+    type: "string",
+    description: "Custom message for individual DM messages",
     required: false,
   };
-  
+
   customParams.sender = {
-    flags: ['--sender'],
-    type: 'string',
-    description: 'Wallet address to use as sender',
+    flags: ["--sender"],
+    type: "string",
+    description: "Wallet address to use as sender",
     required: false,
   };
-  
+
   customParams.users = {
-    flags: ['--users'],
-    type: 'number',
-    description: 'Number of messages to send',
+    flags: ["--users"],
+    type: "number",
+    description: "Number of messages to send",
     required: false,
   };
-  
+
   customParams.attempts = {
-    flags: ['--attempts'],
-    type: 'number',
-    description: 'Number of attempts to send messages',
+    flags: ["--attempts"],
+    type: "number",
+    description: "Number of attempts to send messages",
     required: false,
   };
-  
+
   customParams.threshold = {
-    flags: ['--threshold'],
-    type: 'number',
-    description: 'Success threshold percentage',
+    flags: ["--threshold"],
+    type: "number",
+    description: "Success threshold percentage",
     required: false,
   };
-  
+
   customParams.wait = {
-    flags: ['--wait'],
-    type: 'boolean',
-    description: 'Wait for responses from target',
+    flags: ["--wait"],
+    type: "boolean",
+    description: "Wait for responses from target",
     required: false,
   };
 
   // Parse using centralized system
   const parsedConfig = parseStandardArgs(args, customParams);
-  
+
   // Handle help
   if (parsedConfig.help) {
     showHelp();
@@ -170,22 +173,24 @@ function parseArgs(): Config {
   // Validation
   try {
     // Check mutual exclusivity
-    validateMutuallyExclusive(config, [['target', 'groupId']]);
-    
+    validateMutuallyExclusive(config, [["target", "groupId"]]);
+
     // Check required parameters
     if (!config.groupId && !config.target) {
       throw new Error("Either --group-id or --target is required");
     }
-    
+
     if (config.groupId && !config.message) {
       throw new Error("--message is required when using --group-id");
     }
-    
+
     if (config.attempts < 1) {
       throw new Error("--attempts must be at least 1");
     }
   } catch (error) {
-    console.error(`❌ Error: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 
@@ -296,7 +301,7 @@ async function runSendTask(
   try {
     // Get agent
     const agent = await getAgentInstance();
-    
+
     // Create conversation
     const conversation = await agent.client.conversations.newDmWithIdentifier({
       identifier: config.target!,
@@ -331,7 +336,9 @@ async function runSendTask(
     // Send message
     const sendStart = Date.now();
     const messageText =
-      config.message || config.customMessage || `test-${taskId}-${attempt}-${Date.now()}`;
+      config.message ||
+      config.customMessage ||
+      `test-${taskId}-${attempt}-${Date.now()}`;
     await conversation.send(messageText);
     const sendTime = Date.now() - sendStart;
 
@@ -516,29 +523,40 @@ async function runsendTest(config: Config): Promise<void> {
  */
 async function handleCliManagerExecution(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   // Check if CLI manager parameters are present
-  const hasManagerArgs = args.some(arg => 
-    arg === '--repeat' || arg === '--delay' || arg === '--continue-on-error' || arg === '--verbose'
+  const hasManagerArgs = args.some(
+    (arg) =>
+      arg === "--repeat" ||
+      arg === "--delay" ||
+      arg === "--continue-on-error" ||
+      arg === "--verbose",
   );
-  
+
   if (!hasManagerArgs) {
     // No manager args, run normally
     await main();
     return;
   }
-  
+
   // Parse manager configuration
-  const {  skillArgs, config: managerConfig } = CliManager.parseManagerArgs(args);
-  
+  const { skillArgs, config: managerConfig } =
+    CliManager.parseManagerArgs(args);
+
   if (managerConfig.repeat && managerConfig.repeat > 1) {
-    console.log(`🔄 CLI Manager: Executing send command ${managerConfig.repeat} time(s)`);
-    
+    console.log(
+      `🔄 CLI Manager: Executing send command ${managerConfig.repeat} time(s)`,
+    );
+
     const manager = new CliManager(managerConfig);
-    const results = await manager.executeYarnCommand('send', skillArgs, managerConfig);
-    
+    const results = await manager.executeYarnCommand(
+      "send",
+      skillArgs,
+      managerConfig,
+    );
+
     // Exit with error code if any execution failed
-    const hasFailures = results.some(r => !r.success);
+    const hasFailures = results.some((r) => !r.success);
     process.exit(hasFailures ? 1 : 0);
   } else {
     // Single execution with manager args but no repeat
