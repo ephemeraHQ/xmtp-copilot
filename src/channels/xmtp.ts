@@ -1,5 +1,6 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { logDetails } from "@xmtp/agent-sdk/debug";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { ClaudeHandler, SessionManager } from "../utils/claude-handler.js";
 
 // Load .env file only in local development
@@ -60,9 +61,9 @@ agent.on("text", async (ctx) => {
       fullResponse += chunk;
     }
 
-    // Send the full response back via XMTP
+    // Send the full response back via XMTP as markdown
     if (fullResponse.trim()) {
-      await ctx.sendText(fullResponse);
+      await ctx.conversation.send(fullResponse, ContentTypeMarkdown);
 
       // Add assistant response to session
       session.messages.push({
@@ -70,7 +71,7 @@ agent.on("text", async (ctx) => {
         content: fullResponse,
       });
 
-      console.log(`✅ Sent response to ${senderAddress}`);
+      console.log(`✅ Sent markdown response to ${senderAddress}`);
     }
   } catch (error: any) {
     if (error.name !== "AbortError") {
