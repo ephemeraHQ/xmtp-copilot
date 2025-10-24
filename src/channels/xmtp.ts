@@ -7,13 +7,9 @@ import { getRandomValues } from "node:crypto";
 // Load .env file only in local development
 if (process.env.NODE_ENV !== 'production') process.loadEnvFile(".env");
 
-const signer = createSigner(createUser(process.env.XMTP_WALLET_KEY as `0x${string}`));
-const dbEncryptionKey = fromString(process.env.XMTP_DB_ENCRYPTION_KEY as `0x${string}`,"hex");
-const randomEncryptionKey = getRandomValues(new Uint8Array(32))
-const agent = await Agent.create(signer, {
+const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
   dbPath: (inboxId) =>(process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "." )+ `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
-  dbEncryptionKey: randomEncryptionKey,
 });
 
 

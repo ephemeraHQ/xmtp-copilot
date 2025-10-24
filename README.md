@@ -125,10 +125,14 @@ SLACK_SIGNING_SECRET=your_slack_signing_secret
 To get started, set up the environment variables and run the application:
 
 ```bash
-# Start the Slack bot
-yarn start
+# Run both XMTP and Slack channels simultaneously (recommended)
+yarn dev:channels
 
-# Run CLI commands
+# Or run channels individually:
+yarn dev:xmtp    # XMTP channel listener only
+yarn dev:slack   # Slack bot only
+
+# Run CLI commands (one-off operations):
 yarn groups
 yarn send --target 0x1234... --message "Hello!"
 ```
