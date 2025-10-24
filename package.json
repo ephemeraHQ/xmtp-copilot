@@ -1,6 +1,6 @@
 {
   "name": "xmtp-copilot",
-  "version": "0.4.7",
+  "version": "0.0.1",
   "description": "XMTP Copilot - CLI commands and Slack bot integration for XMTP protocol testing and management",
   "type": "module",
   "bin": {
