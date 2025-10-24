@@ -60,8 +60,8 @@ const config = {
   },
 };
 
-// Main Slack Bot
-class XMTPSlackBot {
+// Main XMTP Copilot Slack Bot
+class XMTPCopilot {
   private app: App;
   private sessionManager: SessionManager;
   private claudeHandler: ClaudeHandler;
@@ -183,7 +183,7 @@ class XMTPSlackBot {
     this.app.event("app_mention", async ({ event, say }) => {
       await say({
         text: formatTextForSlack(
-          `👋 Hi! I'm Claude, running through the XMTP Slack Bot. I can help you with XMTP testing, development, and any questions you have. Just start chatting!`,
+          `👋 Hi! I'm Claude, running through the XMTP Copilot. I can help you with XMTP testing, development, and any questions you have. Just start chatting!`,
         ),
         thread_ts: event.ts,
       });
@@ -301,12 +301,12 @@ class XMTPSlackBot {
 
   async start(): Promise<void> {
     await this.app.start();
-    console.log("🤖 XMTP Slack Bot is running!");
+    console.log("🤖 XMTP Copilot is running!");
   }
 
   async stop(): Promise<void> {
     await this.app.stop();
-    console.log("🤖 XMTP Slack Bot stopped.");
+    console.log("🤖 XMTP Copilot stopped.");
   }
 }
 
@@ -364,7 +364,7 @@ async function main(): Promise<void> {
   }
 
   // Start the bot
-  const bot = new XMTPSlackBot();
+  const bot = new XMTPCopilot();
 
   // Graceful shutdown handlers
   const shutdown = async (signal: string) => {
@@ -415,4 +415,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(console.error);
 }
 
-export { XMTPSlackBot };
+export { XMTPCopilot };

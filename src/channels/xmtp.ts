@@ -107,7 +107,7 @@ agent.on("dm", async (ctx) => {
 
 // Log when we're ready
 agent.on("start", (): void => {
-  console.log("🤖 XMTP Agent with Claude CLI is running!");
+  console.log("🤖 XMTP Copilot with Claude CLI is running!");
   logDetails(agent.client);
 });
 
@@ -118,7 +118,7 @@ const shutdown = async (signal: string) => {
   try {
     sessionManager.cleanupAllSessions();
     await agent.stop();
-    console.log("✅ XMTP Agent stopped successfully");
+    console.log("✅ XMTP Copilot stopped successfully");
   } catch (error) {
     console.error("❌ Error during shutdown:", error);
   } finally {

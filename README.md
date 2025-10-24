@@ -1,10 +1,10 @@
-# XMTP Agent
+# XMTP Copilot
 
-A powerful XMTP agent that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
+A powerful XMTP copilot that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
 
 ## Architecture
 
-This flowchart illustrates the XMTP Agent's modular architecture and integration points:
+This flowchart illustrates the XMTP Copilot's modular architecture and integration points:
 
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
@@ -12,7 +12,7 @@ This flowchart illustrates the XMTP Agent's modular architecture and integration
 flowchart LR
   %% Core components
   subgraph Core["Core XMTP"]
-    agent["Agent Management"]
+    agent["Copilot Management"]
     utils["Utilities"]
   end
 
@@ -64,7 +64,7 @@ flowchart LR
 
 > The highlighted path (red dashed line) shows the main command execution flow from CLI to XMTP operations.
 
-The XMTP Agent provides a comprehensive interface for XMTP protocol operations through both CLI and Slack bot interfaces. The architecture is designed with modularity in mind, allowing for easy extension and maintenance.
+The XMTP Copilot provides a comprehensive interface for XMTP protocol operations through both CLI and Slack bot interfaces. The architecture is designed with modularity in mind, allowing for easy extension and maintenance.
 
 #### Core functionality
 
@@ -101,8 +101,8 @@ The XMTP Agent provides a comprehensive interface for XMTP protocol operations t
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/xmtp-agent
-cd xmtp-agent
+git clone https://github.com/your-org/xmtp-copilot
+cd xmtp-copilot
 
 # Install dependencies
 yarn install
