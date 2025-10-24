@@ -23,7 +23,7 @@ Here is the current standard content type:
 An agent built with XMTP uses the `TextCodec` (plain text) standard content type by default. This means that if your agent is sending plain text messages only, you don't need to perform any additional steps related to content types.
 
 ```jsx [Node]
-await sendText('gm');
+await sendText("gm");
 ```
 
 ## Receiving content types
@@ -32,22 +32,22 @@ When your agent receives messages with different content types, use event handle
 
 ```jsx [Node]
 // Listen for specific content types
-agent.on('attachment', async (ctx) => {
+agent.on("attachment", async (ctx) => {
   // Handle attachment logic
 });
 
-agent.on('reaction', async (ctx) => {
+agent.on("reaction", async (ctx) => {
   // Handle reaction logic
 });
 
-agent.on('reply', async (ctx) => {
+agent.on("reply", async (ctx) => {
   // Handle reply logic
 });
 
 // For custom content types, you can access the content type directly
-agent.on('message', async (ctx) => {
+agent.on("message", async (ctx) => {
   const contentType = ctx.message.contentType;
-  if (contentType?.typeId === 'my-custom-type') {
+  if (contentType?.typeId === "my-custom-type") {
     // Handle custom content logic
   }
 });

@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn } from "child_process";
 export interface CliManagerConfig {
   repeat?: number;
   delay?: number; // milliseconds between executions
@@ -34,7 +34,7 @@ export class CliManager {
   async executeCommand(
     command: string,
     args: string[] = [],
-    options: CliManagerConfig = {}
+    options: CliManagerConfig = {},
   ): Promise<ExecutionResult[]> {
     const finalConfig = { ...this.config, ...options };
     const results: ExecutionResult[] = [];
@@ -42,12 +42,12 @@ export class CliManager {
 
     if (finalConfig.verbose) {
       console.log(`🔄 CLI Manager: Executing command ${repeatCount} time(s)`);
-      console.log(`📝 Command: ${command} ${args.join(' ')}`);
+      console.log(`📝 Command: ${command} ${args.join(" ")}`);
     }
 
     for (let i = 0; i < repeatCount; i++) {
       const startTime = Date.now();
-      
+
       if (finalConfig.verbose && repeatCount > 1) {
         console.log(`\n🔄 Execution ${i + 1}/${repeatCount}`);
       }
@@ -57,14 +57,18 @@ export class CliManager {
         results.push(result);
 
         if (!result.success && !finalConfig.continueOnError) {
-          console.error(`❌ Execution ${i + 1} failed, stopping (use --continue-on-error to override)`);
+          console.error(
+            `❌ Execution ${i + 1} failed, stopping (use --continue-on-error to override)`,
+          );
           break;
         }
 
         // Add delay between executions (except for the last one)
         if (i < repeatCount - 1 && finalConfig.delay && finalConfig.delay > 0) {
           if (finalConfig.verbose) {
-            console.log(`⏳ Waiting ${finalConfig.delay}ms before next execution...`);
+            console.log(
+              `⏳ Waiting ${finalConfig.delay}ms before next execution...`,
+            );
           }
           await this.delay(finalConfig.delay);
         }
@@ -72,7 +76,7 @@ export class CliManager {
         const errorResult: ExecutionResult = {
           success: false,
           exitCode: 1,
-          stdout: '',
+          stdout: "",
           stderr: error instanceof Error ? error.message : String(error),
           executionTime: Date.now() - startTime,
           attempt: i + 1,
@@ -95,19 +99,19 @@ export class CliManager {
   private async runSingleExecution(
     command: string,
     args: string[],
-    attempt: number
+    attempt: number,
   ): Promise<ExecutionResult> {
     return new Promise((resolve) => {
       const startTime = Date.now();
-      let stdout = '';
-      let stderr = '';
+      let stdout = "";
+      let stderr = "";
 
       const child = spawn(command, args, {
-        stdio: ['inherit', 'pipe', 'pipe'],
+        stdio: ["inherit", "pipe", "pipe"],
         shell: true,
       });
 
-      child.stdout?.on('data', (data) => {
+      child.stdout?.on("data", (data) => {
         const output = data.toString();
         stdout += output;
         if (this.config.verbose) {
@@ -115,7 +119,7 @@ export class CliManager {
         }
       });
 
-      child.stderr?.on('data', (data) => {
+      child.stderr?.on("data", (data) => {
         const output = data.toString();
         stderr += output;
         if (this.config.verbose) {
@@ -123,7 +127,7 @@ export class CliManager {
         }
       });
 
-      child.on('close', (code) => {
+      child.on("close", (code) => {
         const executionTime = Date.now() - startTime;
         resolve({
           success: code === 0,
@@ -135,7 +139,7 @@ export class CliManager {
         });
       });
 
-      child.on('error', (error) => {
+      child.on("error", (error) => {
         const executionTime = Date.now() - startTime;
         resolve({
           success: false,
@@ -155,10 +159,10 @@ export class CliManager {
   async executeYarnCommand(
     skill: string,
     args: string[] = [],
-    options: CliManagerConfig = {}
+    options: CliManagerConfig = {},
   ): Promise<ExecutionResult[]> {
     const yarnArgs = [skill, ...args];
-    return this.executeCommand('yarn', yarnArgs, options);
+    return this.executeCommand("yarn", yarnArgs, options);
   }
 
   /**
@@ -175,17 +179,22 @@ export class CliManager {
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
-      
-      if (arg === '--repeat' || arg === '--delay' || arg === '--continue-on-error' || arg === '--verbose') {
+
+      if (
+        arg === "--repeat" ||
+        arg === "--delay" ||
+        arg === "--continue-on-error" ||
+        arg === "--verbose"
+      ) {
         isManagerArg = true;
         managerArgs.push(arg);
-        
+
         // If next arg is not a flag, it's the value for this flag
-        if (i + 1 < args.length && !args[i + 1].startsWith('--')) {
+        if (i + 1 < args.length && !args[i + 1].startsWith("--")) {
           managerArgs.push(args[i + 1]);
           i++; // Skip the next argument
         }
-      } else if (arg.startsWith('--')) {
+      } else if (arg.startsWith("--")) {
         isManagerArg = false;
         skillArgs.push(arg);
       } else if (isManagerArg) {
@@ -200,20 +209,20 @@ export class CliManager {
     for (let i = 0; i < managerArgs.length; i++) {
       const arg = managerArgs[i];
       const nextArg = managerArgs[i + 1];
-      
+
       switch (arg) {
-        case '--repeat':
+        case "--repeat":
           config.repeat = parseInt(nextArg) || 1;
           i++;
           break;
-        case '--delay':
+        case "--delay":
           config.delay = parseInt(nextArg) || 0;
           i++;
           break;
-        case '--continue-on-error':
+        case "--continue-on-error":
           config.continueOnError = true;
           break;
-        case '--verbose':
+        case "--verbose":
           config.verbose = true;
           break;
       }
@@ -228,21 +237,25 @@ export class CliManager {
   private printSummary(results: ExecutionResult[]): void {
     if (results.length <= 1) return;
 
-    const successful = results.filter(r => r.success);
-    const failed = results.filter(r => !r.success);
+    const successful = results.filter((r) => r.success);
+    const failed = results.filter((r) => !r.success);
     const totalTime = results.reduce((sum, r) => sum + r.executionTime, 0);
     const avgTime = totalTime / results.length;
 
-    console.log('\n📊 CLI Manager Summary:');
+    console.log("\n📊 CLI Manager Summary:");
     console.log(`✅ Successful: ${successful.length}/${results.length}`);
     console.log(`❌ Failed: ${failed.length}/${results.length}`);
     console.log(`⏱️  Total time: ${(totalTime / 1000).toFixed(2)}s`);
-    console.log(`📈 Average time: ${(avgTime / 1000).toFixed(2)}s per execution`);
+    console.log(
+      `📈 Average time: ${(avgTime / 1000).toFixed(2)}s per execution`,
+    );
 
     if (failed.length > 0) {
-      console.log('\n❌ Failed executions:');
-      failed.forEach(result => {
-        console.log(`  Attempt ${result.attempt}: Exit code ${result.exitCode}`);
+      console.log("\n❌ Failed executions:");
+      failed.forEach((result) => {
+        console.log(
+          `  Attempt ${result.attempt}: Exit code ${result.exitCode}`,
+        );
         if (result.stderr) {
           console.log(`    Error: ${result.stderr.trim()}`);
         }
@@ -254,7 +267,7 @@ export class CliManager {
    * Utility method to add delay
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -264,7 +277,7 @@ export class CliManager {
 export async function executeSkillWithManager(
   skill: string,
   args: string[] = [],
-  options: CliManagerConfig = {}
+  options: CliManagerConfig = {},
 ): Promise<ExecutionResult[]> {
   const manager = new CliManager(options);
   return manager.executeYarnCommand(skill, args, options);

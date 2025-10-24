@@ -1,21 +1,19 @@
 import { createRequire } from "node:module";
 import "dotenv/config";
 import { Client, XmtpEnv } from "@xmtp/node-sdk";
-import { 
-  parseStandardArgs, 
-  generateHelpText, 
+import {
+  parseStandardArgs,
+  generateHelpText,
   type StandardCliParams,
 } from "../cli/cli-params";
-import { 
-  getAgentInstance, 
+import {
+  getAgentInstance,
   logOperationStart,
   logOperationSuccess,
   logOperationFailure,
-  logSectionHeader
+  logSectionHeader,
 } from "../core/agent";
-import { 
-  validateEthereumAddress,
-} from "../utils/validation";
+import { validateEthereumAddress } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 // Get XMTP SDK version from package.json
@@ -25,56 +23,71 @@ const xmtpSdkVersion: string =
   packageJson.dependencies["@xmtp/agent-sdk"] ?? "unknown";
 
 interface Config extends StandardCliParams {
-  operation: "address" | "inbox" | "key-package" | "resolve" | "info" | "installations";
+  operation:
+    | "address"
+    | "inbox"
+    | "key-package"
+    | "resolve"
+    | "info"
+    | "installations";
   // Address operations
   targetAddress?: string;
-  // Inbox operations  
+  // Inbox operations
   inboxId?: string;
 }
 
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ['address', 'inbox', 'key-package', 'resolve', 'info', 'installations'],
-      type: 'string' as const,
-      description: 'Operation to perform',
+      flags: [
+        "address",
+        "inbox",
+        "key-package",
+        "resolve",
+        "info",
+        "installations",
+      ],
+      type: "string" as const,
+      description: "Operation to perform",
       required: true,
     },
     targetAddress: {
-      flags: ['--address', '--target-address'],
-      type: 'string' as const,
-      description: 'Ethereum address to query or resolve to inbox ID',
+      flags: ["--address", "--target-address"],
+      type: "string" as const,
+      description: "Ethereum address to query or resolve to inbox ID",
       required: false,
     },
     inboxId: {
-      flags: ['--inbox-id'],
-      type: 'string' as const,
-      description: '64-character hexadecimal inbox ID to query',
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "64-character hexadecimal inbox ID to query",
       required: false,
     },
   };
 
   const examples = [
-    'yarn debug address --address 0x1234...',
-    'yarn debug resolve --address 0x1234...',
-    'yarn debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64',
-    'yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64',
-    'yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64',
-    'yarn debug info',
+    "yarn debug address --address 0x1234...",
+    "yarn debug resolve --address 0x1234...",
+    "yarn debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64",
+    "yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64",
+    "yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64",
+    "yarn debug info",
   ];
 
-  console.log(generateHelpText(
-    'XMTP Debug CLI - Address, Inbox, Key Package, and Installation Information',
-    'Get detailed information about XMTP addresses, inboxes, key packages, and installations',
-    'yarn debug <operation> [options]',
-    customParams,
-    examples
-  ));
+  console.log(
+    generateHelpText(
+      "XMTP Debug CLI - Address, Inbox, Key Package, and Installation Information",
+      "Get detailed information about XMTP addresses, inboxes, key packages, and installations",
+      "yarn debug <operation> [options]",
+      customParams,
+      examples,
+    ),
+  );
 }
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
-  
+
   // Handle help
   if (args.includes("--help") || args.includes("-h")) {
     showHelp();
@@ -84,7 +97,7 @@ function parseArgs(): Config {
   // Extract operation from first argument if not a flag
   let operation = "info";
   let remainingArgs = args;
-  
+
   if (args.length > 0 && !args[0].startsWith("--")) {
     operation = args[0];
     remainingArgs = args.slice(1);
@@ -92,21 +105,27 @@ function parseArgs(): Config {
 
   const customParams = {
     targetAddress: {
-      flags: ['--address', '--target-address'],
-      type: 'string' as const,
-      description: 'Ethereum address to query or resolve to inbox ID',
+      flags: ["--address", "--target-address"],
+      type: "string" as const,
+      description: "Ethereum address to query or resolve to inbox ID",
       required: false,
     },
     inboxId: {
-      flags: ['--inbox-id'],
-      type: 'string' as const,
-      description: '64-character hexadecimal inbox ID to query',
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "64-character hexadecimal inbox ID to query",
       required: false,
     },
   };
 
   const config = parseStandardArgs(remainingArgs, customParams) as Config;
-  config.operation = operation as "address" | "inbox" | "key-package" | "resolve" | "info" | "installations";
+  config.operation = operation as
+    | "address"
+    | "inbox"
+    | "key-package"
+    | "resolve"
+    | "info"
+    | "installations";
 
   // Validation
   if (config.targetAddress && !validateEthereumAddress(config.targetAddress)) {
@@ -128,7 +147,10 @@ async function runAddressOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("Address Information", `Getting information for address: ${config.targetAddress}`);
+  logOperationStart(
+    "Address Information",
+    `Getting information for address: ${config.targetAddress}`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -153,7 +175,9 @@ async function runAddressOperation(config: Config): Promise<void> {
     );
 
     if (!inboxState || inboxState.length === 0) {
-      console.log(`❌ No inbox state found for address: ${config.targetAddress}`);
+      console.log(
+        `❌ No inbox state found for address: ${config.targetAddress}`,
+      );
       return;
     }
 
@@ -187,7 +211,10 @@ async function runResolveOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("Resolve Address", `Resolving address to inbox ID: ${config.targetAddress}`);
+  logOperationStart(
+    "Resolve Address",
+    `Resolving address to inbox ID: ${config.targetAddress}`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -223,7 +250,10 @@ async function runInboxOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("Inbox Information", `Getting information for inbox: ${config.inboxId}`);
+  logOperationStart(
+    "Inbox Information",
+    `Getting information for inbox: ${config.inboxId}`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -253,7 +283,9 @@ async function runInboxOperation(config: Config): Promise<void> {
     if (identifiers.length > 0) {
       console.log(`\n🏷️  Identifiers:`);
       identifiers.forEach((identifier, index) => {
-        console.log(`   ${index + 1}. ${identifier.identifier} (kind: ${identifier.identifierKind})`);
+        console.log(
+          `   ${index + 1}. ${identifier.identifier} (kind: ${identifier.identifierKind})`,
+        );
       });
     }
 
@@ -278,7 +310,10 @@ async function runKeyPackageOperation(config: Config): Promise<void> {
     return;
   }
 
-  logOperationStart("Key Package Information", `Getting key package status for inbox: ${config.inboxId}`);
+  logOperationStart(
+    "Key Package Information",
+    `Getting key package status for inbox: ${config.inboxId}`,
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -326,8 +361,10 @@ async function runKeyPackageOperation(config: Config): Promise<void> {
 
     if (totalInstallations > 0) {
       console.log(`\n🔑 Installation Details:`);
-      
-      for (const [installationId, installationStatus] of Object.entries(status)) {
+
+      for (const [installationId, installationStatus] of Object.entries(
+        status,
+      )) {
         // Abbreviate the installation ID (first 4 and last 4 characters)
         const shortId =
           installationId.length > 8
@@ -342,9 +379,13 @@ async function runKeyPackageOperation(config: Config): Promise<void> {
             Number(installationStatus.lifetime.notAfter) * 1000,
           );
 
-          console.log(`   ✅ ${shortId}: Created ${createdDate.toLocaleDateString()}, Valid until ${expiryDate.toLocaleDateString()}`);
+          console.log(
+            `   ✅ ${shortId}: Created ${createdDate.toLocaleDateString()}, Valid until ${expiryDate.toLocaleDateString()}`,
+          );
         } else if (installationStatus?.validationError) {
-          console.log(`   ❌ ${shortId}: Error - ${installationStatus.validationError}`);
+          console.log(
+            `   ❌ ${shortId}: Error - ${installationStatus.validationError}`,
+          );
         }
       }
     }
@@ -357,7 +398,10 @@ async function runKeyPackageOperation(config: Config): Promise<void> {
 
 // Operation: General Info
 async function runInfoOperation(_config: Config): Promise<void> {
-  logOperationStart("General Information", "Getting general XMTP debug information");
+  logOperationStart(
+    "General Information",
+    "Getting general XMTP debug information",
+  );
 
   // Get agent
   const agent = await getAgentInstance();
@@ -411,12 +455,17 @@ async function runInfoOperation(_config: Config): Promise<void> {
 // Operation: Installations Information
 async function runInstallationsOperation(config: Config): Promise<void> {
   if (!config.inboxId) {
-    console.error(`❌ Error: --inbox-id is required for installations operation`);
+    console.error(
+      `❌ Error: --inbox-id is required for installations operation`,
+    );
     console.log(`   Usage: yarn debug installations --inbox-id <inbox-id>`);
     return;
   }
 
-  logOperationStart("Installations Information", `Getting installation information for inbox: ${config.inboxId}`);
+  logOperationStart(
+    "Installations Information",
+    `Getting installation information for inbox: ${config.inboxId}`,
+  );
 
   try {
     await getAgentInstance();
@@ -427,19 +476,22 @@ async function runInstallationsOperation(config: Config): Promise<void> {
     );
 
     const installations = inboxState[0].installations;
-    
+
     logSectionHeader("Installation Debug Information");
     console.log(`   Inbox ID: ${config.inboxId}`);
     console.log(`   Environment: ${process.env.XMTP_ENV ?? "dev"}`);
     console.log(`   Total Installations: ${installations.length}`);
-    
+
     installations.forEach((installation, index) => {
       console.log(`\n   Installation ${index + 1}:`);
       console.log(`     ID: ${installation.id}`);
       console.log(`     Bytes Length: ${installation.bytes.length}`);
     });
 
-    logOperationSuccess("Installations Information", "Installation information retrieved");
+    logOperationSuccess(
+      "Installations Information",
+      "Installation information retrieved",
+    );
   } catch (error) {
     logOperationFailure("Installations Information", error as Error);
   }
@@ -450,29 +502,40 @@ async function runInstallationsOperation(config: Config): Promise<void> {
  */
 async function handleCliManagerExecution(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   // Check if CLI manager parameters are present
-  const hasManagerArgs = args.some(arg => 
-    arg === '--repeat' || arg === '--delay' || arg === '--continue-on-error' || arg === '--verbose'
+  const hasManagerArgs = args.some(
+    (arg) =>
+      arg === "--repeat" ||
+      arg === "--delay" ||
+      arg === "--continue-on-error" ||
+      arg === "--verbose",
   );
-  
+
   if (!hasManagerArgs) {
     // No manager args, run normally
     await main();
     return;
   }
-  
+
   // Parse manager configuration
-  const { skillArgs, config: managerConfig } = CliManager.parseManagerArgs(args);
-  
+  const { skillArgs, config: managerConfig } =
+    CliManager.parseManagerArgs(args);
+
   if (managerConfig.repeat && managerConfig.repeat > 1) {
-    console.log(`🔄 CLI Manager: Executing debug command ${managerConfig.repeat} time(s)`);
-    
+    console.log(
+      `🔄 CLI Manager: Executing debug command ${managerConfig.repeat} time(s)`,
+    );
+
     const manager = new CliManager(managerConfig);
-    const results = await manager.executeYarnCommand('debug', skillArgs, managerConfig);
-    
+    const results = await manager.executeYarnCommand(
+      "debug",
+      skillArgs,
+      managerConfig,
+    );
+
     // Exit with error code if any execution failed
-    const hasFailures = results.some(r => !r.success);
+    const hasFailures = results.some((r) => !r.success);
     process.exit(hasFailures ? 1 : 0);
   } else {
     // Single execution with manager args but no repeat
