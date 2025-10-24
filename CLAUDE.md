@@ -72,6 +72,30 @@ yarn send --target 0x1234... --custom-message "Test message" --repeat 3 --delay 
 yarn send --target 0x1234... --users 1 --repeat 5 --continue-on-error --verbose
 
 
+# List Operations
+
+## List all conversations
+yarn list conversations
+
+## List conversations with pagination
+yarn list conversations --limit 20
+
+## List conversations with custom offset
+yarn list conversations --limit 10 --offset 20
+
+## List members from a conversation
+yarn list members --conversation-id <conversation-id>
+
+## List messages from a conversation
+yarn list messages --conversation-id <conversation-id>
+
+## List messages with pagination
+yarn list messages --conversation-id <conversation-id> --limit 10
+
+## List messages with custom offset
+yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
+
+
 # Installations Management
 
 ## Get installation information for an inbox

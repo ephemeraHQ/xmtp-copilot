@@ -69,10 +69,11 @@ The XMTP Agent provides a comprehensive interface for XMTP protocol operations t
 #### Core functionality
 
 - **CLI Interface**: Command-line operations for XMTP protocol testing
-- **Slack Integration**: Interactive bot for real-time XMTP operations
+- **Slack Integration**: Interactive bot for real-time XMTP operations with Claude CLI
+- **XMTP Channel**: Message relay through Claude CLI for AI-powered responses
 - **Group Management**: Create and manage XMTP groups and conversations
 - **Message Operations**: Send messages, debug information, and manage permissions
-- **Session Management**: Maintain context across interactions
+- **Session Management**: Maintain conversation context across both channels
 
 ## Documentation
 
