@@ -1,7 +1,7 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { logDetails } from "@xmtp/agent-sdk/debug";
 import { ContentTypeMarkdown, MarkdownCodec } from "@xmtp/content-type-markdown";
-import { ClaudeHandler, SessionManager } from "../utils/claude-handler.js";
+import { ClaudeHandler, SessionManager } from "../utils/claude-handler";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { AttachmentCodec, RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
