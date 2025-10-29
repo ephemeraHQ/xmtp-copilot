@@ -1,5 +1,5 @@
 import { Agent } from "@xmtp/agent-sdk";
-import newInboxes2 from "../../data/inboxes.json";
+import newInboxes2 from "../core/inboxes.json";
 import {
   MarkdownCodec,
 } from "@xmtp/content-type-markdown";
@@ -347,7 +347,7 @@ export async function getAgent(): Promise<Agent> {
   if (!agentInstance) {
     agentInstance = await Agent.createFromEnv({
       dbPath: (inboxId) =>
-        `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "."}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+        `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
       codecs: [
         new MarkdownCodec(),
         new ReactionCodec(),
@@ -451,4 +451,23 @@ export function getInboxes(
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((inbox) => inbox);
+}
+
+/**
+ * Get random account addresses from inboxes.json
+ * @param count Number of random addresses to return
+ * @param installationCount Filter by installation count (default: 2)
+ * @param maxIndex Maximum index to consider from the pool (default: 200)
+ * @returns Array of account addresses
+ */
+export function getRandomAccountAddresses(
+  count: number,
+  installationCount: number = 2,
+  maxIndex: number = 200,
+): string[] {
+  const pool = getInboxByInstallationCount(installationCount, maxIndex);
+  return pool
+    .sort(() => Math.random() - 0.5)
+    .slice(0, count)
+    .map((inbox) => inbox.accountAddress);
 }

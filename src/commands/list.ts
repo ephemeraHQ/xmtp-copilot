@@ -12,22 +12,25 @@ import {
   logOperationFailure,
   logSectionHeader,
 } from "../core/agent";
-import { validateGroupId } from "../utils/validation";
+import { validateGroupId, validateEthereumAddress } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
-  operation: "conversations" | "members" | "messages";
+  operation: "conversations" | "members" | "messages" | "find";
   // Conversation ID for specific operations
   conversationId?: string;
   // Pagination options
   limit?: number;
   offset?: number;
+  // Find operation options
+  inboxId?: string;
+  address?: string;
 }
 
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ["conversations", "members", "messages"],
+      flags: ["conversations", "members", "messages", "find"],
       type: "string" as const,
       description: "Operation to perform",
       required: true,
@@ -52,6 +55,18 @@ function showHelp() {
       required: false,
       defaultValue: 0,
     },
+    inboxId: {
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "Inbox ID to find conversation for (find operation only)",
+      required: false,
+    },
+    address: {
+      flags: ["--address"],
+      type: "string" as const,
+      description: "Ethereum address to find conversation for (find operation only, will be resolved to inbox ID)",
+      required: false,
+    },
   };
 
   const examples = [
@@ -60,6 +75,10 @@ function showHelp() {
     "yarn list members --conversation-id <conversation-id>",
     "yarn list messages --conversation-id <conversation-id>",
     "yarn list messages --conversation-id <conversation-id> --limit 10",
+    "yarn list find --inbox-id <inbox-id>",
+    "yarn list find --address <ethereum-address>",
+    "yarn list find --inbox-id <inbox-id> --limit 5",
+    "yarn list find --address <ethereum-address> --limit 5",
   ];
 
   console.log(
@@ -112,6 +131,18 @@ function parseArgs(): Config {
       required: false,
       defaultValue: 0,
     },
+    inboxId: {
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "Inbox ID to find conversation for (find operation only)",
+      required: false,
+    },
+    address: {
+      flags: ["--address"],
+      type: "string" as const,
+      description: "Ethereum address to find conversation for (find operation only, will be resolved to inbox ID)",
+      required: false,
+    },
   };
 
   const config = parseStandardArgs(remainingArgs, customParams) as Config;
@@ -120,6 +151,10 @@ function parseArgs(): Config {
   // Validation
   if (config.conversationId && !validateGroupId(config.conversationId)) {
     throw new Error(`Invalid conversation ID: ${config.conversationId}`);
+  }
+
+  if (config.address && !validateEthereumAddress(config.address)) {
+    throw new Error(`Invalid address: ${config.address}`);
   }
 
   return config;
@@ -379,6 +414,155 @@ async function runMessagesOperation(config: Config): Promise<void> {
   }
 }
 
+// Operation: Find conversation by inbox ID or address and get messages
+async function runFindOperation(config: Config): Promise<void> {
+  if (!config.inboxId && !config.address) {
+    console.error(
+      `❌ Error: Either --inbox-id or --address is required for find operation`,
+    );
+    console.log(
+      `   Usage: yarn list find --inbox-id <inbox-id>`,
+    );
+    console.log(
+      `   Or: yarn list find --address <ethereum-address>`,
+    );
+    return;
+  }
+
+  // If both are provided, inbox-id takes precedence
+  if (config.inboxId && config.address) {
+    console.warn(`⚠️  Both --inbox-id and --address provided. Using --inbox-id.`);
+  }
+
+  const limit = config.limit ?? 50;
+  const offset = config.offset ?? 0;
+
+  // Determine which identifier to use
+  let targetInboxId: string;
+  let identifierType: string;
+  
+  if (config.inboxId) {
+    targetInboxId = config.inboxId;
+    identifierType = "inbox ID";
+  } else {
+    // Resolve address to inbox ID
+    const agent = await getAgentInstance();
+    try {
+      const resolvedInboxId = await agent.client.getInboxIdByIdentifier({
+        identifier: config.address!,
+        identifierKind: 0,
+      });
+      
+      if (!resolvedInboxId) {
+        console.log(`❌ No inbox found for address: ${config.address}`);
+        console.log(`   This address may not be registered with XMTP`);
+        return;
+      }
+      
+      targetInboxId = resolvedInboxId;
+      
+      console.log(`📍 Resolved address ${config.address} to inbox ID: ${targetInboxId}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`❌ Failed to resolve address to inbox ID: ${errorMessage}`);
+      return;
+    }
+    identifierType = "address";
+  }
+
+  logOperationStart(
+    "Find Conversation",
+    `Finding conversation with ${identifierType}: ${config.inboxId || config.address}`,
+  );
+
+  // Get agent
+  const agent = await getAgentInstance();
+
+  try {
+    // Get all conversations
+    const conversations = await agent.client.conversations.list();
+    
+    logSectionHeader("Search Results");
+    console.log(`   Searching ${conversations.length} conversations for ${identifierType}: ${config.inboxId || config.address}`);
+    console.log(`   Environment: ${process.env.XMTP_ENV ?? "production"}`);
+
+    let foundConversation = null;
+
+    // Search through conversations to find one with the target inbox ID
+    for (const conversation of conversations) {
+      try {
+        // Get first message to check sender
+        const messages = await conversation.messages();
+        if (messages.length > 0) {
+          const firstMessage = messages[0];
+          if (firstMessage.senderInboxId === targetInboxId) {
+            foundConversation = conversation;
+            break;
+          }
+        }
+      } catch {
+        // Skip conversations that error
+        continue;
+      }
+    }
+
+    if (!foundConversation) {
+      console.log(`\n❌ No conversation found with ${identifierType}: ${config.inboxId || config.address}`);
+      console.log(`   This ${identifierType} may not have any conversations with you yet.`);
+      logOperationSuccess("Find Conversation");
+      return;
+    }
+
+    // Found the conversation, now get messages
+    console.log(`\n✅ Found conversation!`);
+    console.log(`   Conversation ID: ${foundConversation.id}`);
+    console.log(`   Type: ${"groupName" in foundConversation ? "Group" : "Direct Message"}`);
+    console.log(`   URL: https://xmtp.chat/conversations/${foundConversation.id}`);
+
+    // Get messages from the found conversation
+    const allMessages = await foundConversation.messages();
+    const totalMessages = allMessages.length;
+    const paginatedMessages = allMessages.slice(offset, offset + limit);
+
+    logSectionHeader("Messages Summary");
+    console.log(`   Total Messages: ${totalMessages}`);
+    console.log(
+      `   Showing: ${paginatedMessages.length} (offset: ${offset}, limit: ${limit})`,
+    );
+
+    if (paginatedMessages.length > 0) {
+      console.log(`\n📝 Messages:`);
+
+      for (let i = 0; i < paginatedMessages.length; i++) {
+        const message = paginatedMessages[i];
+        const timestamp = message.sentAt
+          ? new Date(message.sentAt).toISOString()
+          : "Unknown time";
+        const sender = message.senderInboxId || "Unknown sender";
+        const content = message.content;
+
+        console.log(`\n   ${i + 1 + offset}. [${timestamp}]`);
+        console.log(`      Sender: ${sender}`);
+        console.log(`      Content: ${content}`);
+      }
+
+      if (totalMessages > limit) {
+        console.log(
+          `\n   ... and ${totalMessages - (offset + limit)} more messages`,
+        );
+        console.log(`   Use --offset and --limit to paginate through results`);
+      }
+    } else {
+      console.log(`   No messages found in this conversation`);
+    }
+
+    logOperationSuccess("Find Conversation");
+  } catch (error) {
+    logOperationFailure("Find Conversation", error as Error);
+    return;
+  }
+}
+
 /**
  * Check if CLI manager should be used and handle execution
  */
@@ -437,6 +621,9 @@ async function main(): Promise<void> {
       break;
     case "messages":
       await runMessagesOperation(config);
+      break;
+    case "find":
+      await runFindOperation(config);
       break;
     default:
       showHelp();

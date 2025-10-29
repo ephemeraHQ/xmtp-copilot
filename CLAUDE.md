@@ -36,6 +36,9 @@ yarn groups create --name "My Group" --members 5
 ## Create group by Ethereum addresses
 yarn groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."
 
+## Create group with random addresses from inboxes.json
+yarn groups create-by-address --name "Random Group" --members 5
+
 ## Update group metadata
 yarn groups metadata --group-id <group-id> --name "New Name" --description "New description"
 
@@ -101,6 +104,14 @@ yarn list messages --conversation-id <conversation-id> --limit 10
 ## List messages with custom offset
 yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
 
+## Find conversation by inbox ID and get messages
+yarn list find --inbox-id <inbox-id>
+yarn list find --inbox-id <inbox-id> --limit 5
+
+## Find conversation by address and get messages
+yarn list find --address <ethereum-address>
+yarn list find --address <ethereum-address> --limit 5
+
 
 # Debug & Information
 
@@ -109,18 +120,23 @@ yarn debug info
 
 ## Get address information
 yarn debug address --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+yarn debug address --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
-## Resolve address to inbox ID
+## Resolve address to inbox ID (or inbox ID to address)
 yarn debug resolve --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+yarn debug resolve --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
 ## Get inbox information
 yarn debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug inbox --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Check key package status
 yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug key-package --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Get installation information for an inbox
 yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug installations --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 
 # Content Types
@@ -152,3 +168,74 @@ yarn content text --target 0x1234... --repeat 3 --delay 1000
 ```
 
 Nothing else. Be helpful and friendly.
+
+
+# Claude Code Prompts for XMTP CLI
+
+This are examples of potential prompts asked by the user and how you may react to them via CLI commands.
+
+### Basic message sending
+
+```bash
+send the same message 2 times to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 (a nice message)
+```
+
+**cli commands:**
+
+> yarn send --target 0x1234... --message "Hello!"
+
+### Group creation
+
+```bash
+create a group with 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 and send 3 messages. add 3 random address to the group
+```
+
+**cli commands:**
+
+> yarn groups create-by-address --name "My Group" --members 5
+> yarn send --group-id <group-id> --message "Hello!"
+
+### Debug address
+
+```bash
+get information for the address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
+```
+
+**cli commands:**
+
+> yarn debug address --address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5   
+
+### agent health
+
+```bash
+check the health of the agent bankr
+```
+
+**cli commands:**
+
+> check data/agents.ts for the address and then run the command
+> yarn send --target 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d --message "hi"
+> sleep 10 seconds
+> yarn list messages --conversation-id <conversation-id> and check if the message is there
+
+
+### content types
+
+```bash
+send an image to 0x1234...
+```
+
+**cli commands:**
+
+> yarn content attachment --target 0x1234...
+
+
+### fetch latest messages from a conversation
+
+```bash
+fetch the latest messages from the conversation with agent bankr
+```
+
+**cli commands:**
+
+> yarn list find --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (finds conversation and shows messages directly)
