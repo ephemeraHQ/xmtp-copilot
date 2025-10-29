@@ -108,6 +108,10 @@ yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
 yarn list find --inbox-id <inbox-id>
 yarn list find --inbox-id <inbox-id> --limit 5
 
+## Find conversation by address and get messages
+yarn list find --address <ethereum-address>
+yarn list find --address <ethereum-address> --limit 5
+
 
 # Debug & Information
 
@@ -116,18 +120,23 @@ yarn debug info
 
 ## Get address information
 yarn debug address --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+yarn debug address --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
-## Resolve address to inbox ID
+## Resolve address to inbox ID (or inbox ID to address)
 yarn debug resolve --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+yarn debug resolve --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
 ## Get inbox information
 yarn debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug inbox --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Check key package status
 yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug key-package --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Get installation information for an inbox
 yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+yarn debug installations --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 
 # Content Types
@@ -227,8 +236,6 @@ send an image to 0x1234...
 fetch the latest messages from the conversation with agent bankr
 ```
 
-**cli commands (simplified 2-step process):**
+**cli commands:**
 
-> 1. check data/agents.ts for the address: `0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d`
-> 2. yarn debug resolve --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (get inbox ID)
-> 3. yarn list find --inbox-id <inbox-id> (finds conversation and shows messages)
+> yarn list find --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (finds conversation and shows messages directly)

@@ -12,7 +12,7 @@ import {
   logOperationFailure,
   logSectionHeader,
 } from "../core/agent";
-import { validateGroupId } from "../utils/validation";
+import { validateGroupId, validateEthereumAddress } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
@@ -24,6 +24,7 @@ interface Config extends StandardCliParams {
   offset?: number;
   // Find operation options
   inboxId?: string;
+  address?: string;
 }
 
 function showHelp() {
@@ -60,6 +61,12 @@ function showHelp() {
       description: "Inbox ID to find conversation for (find operation only)",
       required: false,
     },
+    address: {
+      flags: ["--address"],
+      type: "string" as const,
+      description: "Ethereum address to find conversation for (find operation only, will be resolved to inbox ID)",
+      required: false,
+    },
   };
 
   const examples = [
@@ -69,7 +76,9 @@ function showHelp() {
     "yarn list messages --conversation-id <conversation-id>",
     "yarn list messages --conversation-id <conversation-id> --limit 10",
     "yarn list find --inbox-id <inbox-id>",
+    "yarn list find --address <ethereum-address>",
     "yarn list find --inbox-id <inbox-id> --limit 5",
+    "yarn list find --address <ethereum-address> --limit 5",
   ];
 
   console.log(
@@ -128,6 +137,12 @@ function parseArgs(): Config {
       description: "Inbox ID to find conversation for (find operation only)",
       required: false,
     },
+    address: {
+      flags: ["--address"],
+      type: "string" as const,
+      description: "Ethereum address to find conversation for (find operation only, will be resolved to inbox ID)",
+      required: false,
+    },
   };
 
   const config = parseStandardArgs(remainingArgs, customParams) as Config;
@@ -136,6 +151,10 @@ function parseArgs(): Config {
   // Validation
   if (config.conversationId && !validateGroupId(config.conversationId)) {
     throw new Error(`Invalid conversation ID: ${config.conversationId}`);
+  }
+
+  if (config.address && !validateEthereumAddress(config.address)) {
+    throw new Error(`Invalid address: ${config.address}`);
   }
 
   return config;
@@ -395,24 +414,65 @@ async function runMessagesOperation(config: Config): Promise<void> {
   }
 }
 
-// Operation: Find conversation by inbox ID and get messages
+// Operation: Find conversation by inbox ID or address and get messages
 async function runFindOperation(config: Config): Promise<void> {
-  if (!config.inboxId) {
+  if (!config.inboxId && !config.address) {
     console.error(
-      `❌ Error: --inbox-id is required for find operation`,
+      `❌ Error: Either --inbox-id or --address is required for find operation`,
     );
     console.log(
       `   Usage: yarn list find --inbox-id <inbox-id>`,
     );
+    console.log(
+      `   Or: yarn list find --address <ethereum-address>`,
+    );
     return;
+  }
+
+  // If both are provided, inbox-id takes precedence
+  if (config.inboxId && config.address) {
+    console.warn(`⚠️  Both --inbox-id and --address provided. Using --inbox-id.`);
   }
 
   const limit = config.limit ?? 50;
   const offset = config.offset ?? 0;
 
+  // Determine which identifier to use
+  let targetInboxId: string;
+  let identifierType: string;
+  
+  if (config.inboxId) {
+    targetInboxId = config.inboxId;
+    identifierType = "inbox ID";
+  } else {
+    // Resolve address to inbox ID
+    const agent = await getAgentInstance();
+    try {
+      const resolvedInboxId = await agent.client.getInboxIdByIdentifier({
+        identifier: config.address!,
+        identifierKind: 0,
+      });
+      
+      if (!resolvedInboxId) {
+        console.log(`❌ No inbox found for address: ${config.address}`);
+        console.log(`   This address may not be registered with XMTP`);
+        return;
+      }
+      
+      targetInboxId = resolvedInboxId;
+      
+      console.log(`📍 Resolved address ${config.address} to inbox ID: ${targetInboxId}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`❌ Failed to resolve address to inbox ID: ${errorMessage}`);
+      return;
+    }
+    identifierType = "address";
+  }
+
   logOperationStart(
     "Find Conversation",
-    `Finding conversation with inbox ID: ${config.inboxId}`,
+    `Finding conversation with ${identifierType}: ${config.inboxId || config.address}`,
   );
 
   // Get agent
@@ -423,7 +483,7 @@ async function runFindOperation(config: Config): Promise<void> {
     const conversations = await agent.client.conversations.list();
     
     logSectionHeader("Search Results");
-    console.log(`   Searching ${conversations.length} conversations for inbox ID: ${config.inboxId}`);
+    console.log(`   Searching ${conversations.length} conversations for ${identifierType}: ${config.inboxId || config.address}`);
     console.log(`   Environment: ${process.env.XMTP_ENV ?? "production"}`);
 
     let foundConversation = null;
@@ -435,20 +495,20 @@ async function runFindOperation(config: Config): Promise<void> {
         const messages = await conversation.messages();
         if (messages.length > 0) {
           const firstMessage = messages[0];
-          if (firstMessage.senderInboxId === config.inboxId) {
+          if (firstMessage.senderInboxId === targetInboxId) {
             foundConversation = conversation;
             break;
           }
         }
-      } catch (error) {
+      } catch {
         // Skip conversations that error
         continue;
       }
     }
 
     if (!foundConversation) {
-      console.log(`\n❌ No conversation found with inbox ID: ${config.inboxId}`);
-      console.log(`   This inbox may not have any conversations with you yet.`);
+      console.log(`\n❌ No conversation found with ${identifierType}: ${config.inboxId || config.address}`);
+      console.log(`   This ${identifierType} may not have any conversations with you yet.`);
       logOperationSuccess("Find Conversation");
       return;
     }

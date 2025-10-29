@@ -182,7 +182,7 @@ async function sendTextContent(config: Config): Promise<void> {
     }
 
     // Send text message
-    const textMessage = await conversation.send(
+    await conversation.send(
       "📝 This is a text message that demonstrates basic XMTP messaging!",
     );
     console.log(`✅ Sent text message`);
@@ -190,12 +190,16 @@ async function sendTextContent(config: Config): Promise<void> {
     // Wait a moment
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    // Get the message ID from the conversation
+    const messages = await conversation.messages();
+    const lastMessage = messages[messages.length - 1];
+
     // Send reply
     const { ContentTypeReply } = await import("@xmtp/content-type-reply");
     await conversation.send(
       {
         content: "💬 This is a reply to the text message!",
-        reference: textMessage.id,
+        reference: lastMessage.id,
         contentType: "text/plain",
       },
       ContentTypeReply,
@@ -209,7 +213,7 @@ async function sendTextContent(config: Config): Promise<void> {
     const { ContentTypeReaction } = await import("@xmtp/content-type-reaction");
     await conversation.send(
       {
-        reference: textMessage.id,
+        reference: lastMessage.id,
         action: "added",
         content: "❤️",
         schema: "unicode",
