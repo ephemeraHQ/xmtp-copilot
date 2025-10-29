@@ -1,5 +1,5 @@
 import { Agent } from "@xmtp/agent-sdk";
-import newInboxes2 from "../../data/inboxes.json";
+import newInboxes2 from "../core/inboxes.json";
 import {
   MarkdownCodec,
 } from "@xmtp/content-type-markdown";
