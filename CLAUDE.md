@@ -36,6 +36,9 @@ yarn groups create --name "My Group" --members 5
 ## Create group by Ethereum addresses
 yarn groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."
 
+## Create group with random addresses from inboxes.json
+yarn groups create-by-address --name "Random Group" --members 5
+
 ## Update group metadata
 yarn groups metadata --group-id <group-id> --name "New Name" --description "New description"
 
@@ -180,8 +183,7 @@ create a group with 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 and send 3 messag
 
 **cli commands:**
 
-> yarn groups create --name "My Group" --members 5
-> yarn groups add-members --group-id <group-id> --members 0x1234...,0x5678...
+> yarn groups create-by-address --name "My Group" --members 5
 > yarn send --group-id <group-id> --message "Hello!"
 
 ### Debug address
@@ -211,7 +213,7 @@ check the health of the agent bankr
 ### content types
 
 ```bash
-send an attachment / image to 0x1234...
+send an image to 0x1234...
 ```
 
 **cli commands:**
