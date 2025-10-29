@@ -347,7 +347,7 @@ export async function getAgent(): Promise<Agent> {
   if (!agentInstance) {
     agentInstance = await Agent.createFromEnv({
       dbPath: (inboxId) =>
-        `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "./xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+        `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
       codecs: [
         new MarkdownCodec(),
         new ReactionCodec(),

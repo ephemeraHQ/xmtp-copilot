@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
-    `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "./xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+    `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   codecs: [
     new MarkdownCodec(),
     new ReactionCodec(),
