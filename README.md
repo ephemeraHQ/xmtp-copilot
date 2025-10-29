@@ -70,12 +70,6 @@ XMTP_ENV= dev # local, dev, production
 # public key is 0x3de2787073732369f2e984ca5b981feCbF0f7FC5
 ANTHROPIC_API_KEY=
 
-
-# Pinata API Key
-PINATA_API_KEY=
-PINATA_SECRET_KEY=
-# keys for xmtp-attachments
-
 # keys for xmtp-code
 XMTP_WALLET_KEY=
 XMTP_DB_ENCRYPTION_KEY=
