@@ -452,3 +452,22 @@ export function getInboxes(
     .slice(0, count)
     .map((inbox) => inbox);
 }
+
+/**
+ * Get random account addresses from inboxes.json
+ * @param count Number of random addresses to return
+ * @param installationCount Filter by installation count (default: 2)
+ * @param maxIndex Maximum index to consider from the pool (default: 200)
+ * @returns Array of account addresses
+ */
+export function getRandomAccountAddresses(
+  count: number,
+  installationCount: number = 2,
+  maxIndex: number = 200,
+): string[] {
+  const pool = getInboxByInstallationCount(installationCount, maxIndex);
+  return pool
+    .sort(() => Math.random() - 0.5)
+    .slice(0, count)
+    .map((inbox) => inbox.accountAddress);
+}

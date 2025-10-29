@@ -1,6 +1,6 @@
 import { IdentifierKind, type Group } from "@xmtp/node-sdk";
 import "dotenv/config";
-import { getInboxes } from "../core/agent";
+import { getInboxes, getRandomAccountAddresses } from "../core/agent";
 import {
   parseStandardArgs,
   generateHelpText,
@@ -52,7 +52,7 @@ function showHelp() {
       flags: ["--members"],
       type: "number" as const,
       description:
-        "Number of random members for groups (default: 1, creates DM)",
+        "Number of random members for groups (default: 1, creates DM). For create-by-address operation, uses random addresses from inboxes.json",
       required: false,
       defaultValue: 1,
     },
@@ -82,6 +82,7 @@ function showHelp() {
     'yarn groups --name "My DM"',
     'yarn groups --members 5 --name "My Group"',
     'yarn groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."',
+    'yarn groups create-by-address --name "Random Group" --members 5',
     'yarn groups metadata --group-id <group-id> --name "New Name" --description "New description"',
     'yarn groups metadata --group-id <group-id> --image-url "https://example.com/image.jpg"',
   ];
@@ -132,7 +133,7 @@ function parseArgs(): Config {
       flags: ["--members"],
       type: "number" as const,
       description:
-        "Number of random members for groups (default: 1, creates DM)",
+        "Number of random members for groups (default: 1, creates DM). For create-by-address operation, uses random addresses from inboxes.json",
       required: false,
       defaultValue: 1,
     },
@@ -293,19 +294,46 @@ async function runCreateOperation(config: Config): Promise<void> {
 
 // Operation: Create Group by Address
 async function runCreateByAddressOperation(config: Config): Promise<void> {
-  if (!config.memberAddresses || config.memberAddresses.length === 0) {
+  // Check if we have either member addresses or members count
+  const hasMemberAddresses = config.memberAddresses && config.memberAddresses.length > 0;
+  // Check if members was explicitly provided by looking at command line args
+  const args = process.argv.slice(2);
+  const hasMembersCount = args.includes('--members');
+  
+  if (!hasMemberAddresses && !hasMembersCount) {
     console.error(
-      `❌ Error: --member-addresses is required for create-by-address operation`,
+      `❌ Error: Either --member-addresses or --members is required for create-by-address operation`,
     );
     console.log(
       `   Usage: yarn groups create-by-address --name <name> --member-addresses "0x123...,0x456..."`,
     );
+    console.log(
+      `   Or: yarn groups create-by-address --name <name> --members 5`,
+    );
     return;
+  }
+
+  // If both are provided, member-addresses takes precedence
+  if (hasMemberAddresses && hasMembersCount) {
+    console.warn(`⚠️  Both --member-addresses and --members provided. Using --member-addresses.`);
+  }
+
+  // Determine which addresses to use
+  let finalMemberAddresses: string[];
+  let addressSource: string;
+  
+  if (hasMemberAddresses) {
+    finalMemberAddresses = config.memberAddresses!;
+    addressSource = "provided addresses";
+  } else {
+    // Use random addresses from inboxes.json
+    finalMemberAddresses = getRandomAccountAddresses(config.members!);
+    addressSource = `random addresses from inboxes.json`;
   }
 
   logOperationStart(
     "Group Creation by Address",
-    `Creating group with ${config.memberAddresses.length} member addresses`,
+    `Creating group with ${finalMemberAddresses.length} member addresses`,
   );
 
   // Get agent
@@ -319,12 +347,12 @@ async function runCreateByAddressOperation(config: Config): Promise<void> {
 
   console.log(`👥 Creating group: "${groupName}"`);
   console.log(`📝 Description: "${groupDescription}"`);
-  console.log(`📍 Member addresses: ${config.memberAddresses.join(", ")}`);
+  console.log(`📍 Member addresses (${addressSource}): ${finalMemberAddresses.join(", ")}`);
 
   try {
     // Create group with Ethereum addresses
     const group = (await agent.createGroupWithAddresses(
-      config.memberAddresses.map(
+      finalMemberAddresses.map(
         (address) => address as `0x${string}`,
       ) as `0x${string}`[],
       {
@@ -344,7 +372,8 @@ async function runCreateByAddressOperation(config: Config): Promise<void> {
     console.log(`   Group Name: ${group.name}`);
     console.log(`   Description: ${group.description || "No description"}`);
     console.log(`   Total Members: ${groupMembers.length}`);
-    console.log(`   Member Addresses: ${config.memberAddresses.join(", ")}`);
+    console.log(`   Member Addresses: ${finalMemberAddresses.join(", ")}`);
+    console.log(`   Address Source: ${addressSource}`);
 
     // Send welcome message to group
     const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP groups CLI with ${groupMembers.length} members.`;
