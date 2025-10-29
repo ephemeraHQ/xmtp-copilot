@@ -54,6 +54,12 @@ function showHelp() {
       required: false,
       defaultValue: 0,
     },
+    inboxId: {
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "Inbox ID to find conversation for (find operation only)",
+      required: false,
+    },
   };
 
   const examples = [
@@ -62,6 +68,8 @@ function showHelp() {
     "yarn list members --conversation-id <conversation-id>",
     "yarn list messages --conversation-id <conversation-id>",
     "yarn list messages --conversation-id <conversation-id> --limit 10",
+    "yarn list find --inbox-id <inbox-id>",
+    "yarn list find --inbox-id <inbox-id> --limit 5",
   ];
 
   console.log(
@@ -113,6 +121,12 @@ function parseArgs(): Config {
       description: "Number of items to skip (default: 0)",
       required: false,
       defaultValue: 0,
+    },
+    inboxId: {
+      flags: ["--inbox-id"],
+      type: "string" as const,
+      description: "Inbox ID to find conversation for (find operation only)",
+      required: false,
     },
   };
 
@@ -381,6 +395,114 @@ async function runMessagesOperation(config: Config): Promise<void> {
   }
 }
 
+// Operation: Find conversation by inbox ID and get messages
+async function runFindOperation(config: Config): Promise<void> {
+  if (!config.inboxId) {
+    console.error(
+      `❌ Error: --inbox-id is required for find operation`,
+    );
+    console.log(
+      `   Usage: yarn list find --inbox-id <inbox-id>`,
+    );
+    return;
+  }
+
+  const limit = config.limit ?? 50;
+  const offset = config.offset ?? 0;
+
+  logOperationStart(
+    "Find Conversation",
+    `Finding conversation with inbox ID: ${config.inboxId}`,
+  );
+
+  // Get agent
+  const agent = await getAgentInstance();
+
+  try {
+    // Get all conversations
+    const conversations = await agent.client.conversations.list();
+    
+    logSectionHeader("Search Results");
+    console.log(`   Searching ${conversations.length} conversations for inbox ID: ${config.inboxId}`);
+    console.log(`   Environment: ${process.env.XMTP_ENV ?? "production"}`);
+
+    let foundConversation = null;
+
+    // Search through conversations to find one with the target inbox ID
+    for (const conversation of conversations) {
+      try {
+        // Get first message to check sender
+        const messages = await conversation.messages();
+        if (messages.length > 0) {
+          const firstMessage = messages[0];
+          if (firstMessage.senderInboxId === config.inboxId) {
+            foundConversation = conversation;
+            break;
+          }
+        }
+      } catch (error) {
+        // Skip conversations that error
+        continue;
+      }
+    }
+
+    if (!foundConversation) {
+      console.log(`\n❌ No conversation found with inbox ID: ${config.inboxId}`);
+      console.log(`   This inbox may not have any conversations with you yet.`);
+      logOperationSuccess("Find Conversation");
+      return;
+    }
+
+    // Found the conversation, now get messages
+    console.log(`\n✅ Found conversation!`);
+    console.log(`   Conversation ID: ${foundConversation.id}`);
+    console.log(`   Type: ${"groupName" in foundConversation ? "Group" : "Direct Message"}`);
+    console.log(`   URL: https://xmtp.chat/conversations/${foundConversation.id}`);
+
+    // Get messages from the found conversation
+    const allMessages = await foundConversation.messages();
+    const totalMessages = allMessages.length;
+    const paginatedMessages = allMessages.slice(offset, offset + limit);
+
+    logSectionHeader("Messages Summary");
+    console.log(`   Total Messages: ${totalMessages}`);
+    console.log(
+      `   Showing: ${paginatedMessages.length} (offset: ${offset}, limit: ${limit})`,
+    );
+
+    if (paginatedMessages.length > 0) {
+      console.log(`\n📝 Messages:`);
+
+      for (let i = 0; i < paginatedMessages.length; i++) {
+        const message = paginatedMessages[i];
+        const timestamp = message.sentAt
+          ? new Date(message.sentAt).toISOString()
+          : "Unknown time";
+        const sender = message.senderInboxId || "Unknown sender";
+        const content = message.content;
+
+        console.log(`\n   ${i + 1 + offset}. [${timestamp}]`);
+        console.log(`      Sender: ${sender}`);
+        console.log(`      Content: ${content}`);
+      }
+
+      if (totalMessages > limit) {
+        console.log(
+          `\n   ... and ${totalMessages - (offset + limit)} more messages`,
+        );
+        console.log(`   Use --offset and --limit to paginate through results`);
+      }
+    } else {
+      console.log(`   No messages found in this conversation`);
+    }
+
+    logOperationSuccess("Find Conversation");
+  } catch (error) {
+    logOperationFailure("Find Conversation", error as Error);
+    return;
+  }
+}
+
 /**
  * Check if CLI manager should be used and handle execution
  */
@@ -439,6 +561,9 @@ async function main(): Promise<void> {
       break;
     case "messages":
       await runMessagesOperation(config);
+      break;
+    case "find":
+      await runFindOperation(config);
       break;
     default:
       showHelp();

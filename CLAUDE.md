@@ -101,6 +101,10 @@ yarn list messages --conversation-id <conversation-id> --limit 10
 ## List messages with custom offset
 yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
 
+## Find conversation by inbox ID and get messages
+yarn list find --inbox-id <inbox-id>
+yarn list find --inbox-id <inbox-id> --limit 5
+
 
 # Debug & Information
 
@@ -221,11 +225,8 @@ send an attachment / image to 0x1234...
 fetch the latest messages from the conversation with agent bankr
 ```
 
-**cli commands (correct approach):**
+**cli commands (simplified 2-step process):**
 
 > 1. check data/agents.ts for the address: `0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d`
 > 2. yarn debug resolve --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (get inbox ID)
-> 3. yarn list conversations (to see all conversations)
-> 4. Check each conversation's messages to find one with bankr's inbox ID as sender
-> 5. If found: yarn list messages --conversation-id <conversation-id>
-> 6. If not found: "No conversation with agent bankr exists yet"
+> 3. yarn list find --inbox-id <inbox-id> (finds conversation and shows messages)
