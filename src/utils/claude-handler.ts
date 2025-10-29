@@ -107,6 +107,8 @@ export class ClaudeHandler {
         "📤 Sending prompt to Claude CLI:",
         prompt.substring(0, 200) + (prompt.length > 200 ? "..." : ""),
       );
+      console.log("📤 Full prompt length:", prompt.length);
+      console.log("📤 Full prompt content:", JSON.stringify(prompt));
 
       // Use the same approach as the reference implementation
       const fullResponse = await this.executeClaudeCommand(
@@ -155,6 +157,8 @@ export class ClaudeHandler {
   ): Promise<string> {
     return new Promise((resolve, reject) => {
       console.log("🚀 Spawning Claude CLI process...");
+      console.log("🚀 Command: claude --print", JSON.stringify(prompt));
+      console.log("🚀 Full command: claude --print \"" + prompt + "\"");
 
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {
@@ -164,7 +168,8 @@ export class ClaudeHandler {
 
       // Use spawn with proper error handling
       // Use shell: true to resolve 'claude' from PATH
-      const claudeProcess = spawn("claude", ["--print", prompt], {
+      // Properly quote the prompt to handle spaces and special characters
+      const claudeProcess = spawn("claude", ["--print", `"${prompt}"`], {
         stdio: ["ignore", "pipe", "pipe"],
         detached: false,
         shell: true,

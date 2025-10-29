@@ -6,7 +6,7 @@ import {
   ClaudeHandler,
   SessionManager,
   type Session,
-} from "../utils/claude-handler.js";
+} from "../utils/claude-handler";
 
 // Load environment variables
 dotenvConfig();
