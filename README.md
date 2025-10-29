@@ -34,7 +34,7 @@ xmtp --help
 xmtp <command> --help
 ```
 
-## Development
+## Getting Started
 
 ### Prerequisites
 
@@ -79,14 +79,3 @@ SLACK_BOT_TOKEN=
 SLACK_APP_TOKEN=
 SLACK_SIGNING_SECRET=
 ```
-
-## Deployment
-
-### Railway Deployment
-
-For Railway deployment instructions and configuration, see [RAILWAY.md](./RAILWAY.md).
-
-The Railway deployment configuration maps all local development settings to Railway environment variables and includes:
-- Required environment variables
-- Volume configuration for persistent database storage
-- Step-by-step deployment guide
