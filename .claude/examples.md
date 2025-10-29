@@ -46,3 +46,14 @@ check the health of the agent bankr
 > yarn send --target 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d --message "hi"
 > sleep 10 seconds
 > yarn list messages --conversation-id <conversation-id> and check if the message is there
+
+
+### content types
+
+```bash
+send an attachment / image to 0x1234...
+```
+
+**cli commands:**
+
+> yarn content attachment --target 0x1234...
