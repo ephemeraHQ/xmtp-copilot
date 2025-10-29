@@ -221,10 +221,11 @@ send an attachment / image to 0x1234...
 fetch the latest messages from the conversation with agent bankr
 ```
 
-**cli commands (3-step process):**
+**cli commands (correct approach):**
 
 > 1. check data/agents.ts for the address: `0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d`
-> 2. yarn debug resolve --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d
-> 3. yarn list messages --conversation-id <conversation-id> (if conversation exists)
-> 
-> If no conversation exists, inform user: "No conversation with agent bankr found"
+> 2. yarn debug resolve --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (get inbox ID)
+> 3. yarn list conversations (to see all conversations)
+> 4. Check each conversation's messages to find one with bankr's inbox ID as sender
+> 5. If found: yarn list messages --conversation-id <conversation-id>
+> 6. If not found: "No conversation with agent bankr exists yet"
