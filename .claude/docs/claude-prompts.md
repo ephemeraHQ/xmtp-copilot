@@ -1,11 +1,36 @@
 # Claude Code Prompts for XMTP CLI
 
-Copy and paste these prompts directly into Claude Code to get XMTP CLI commands.
+This are examples of potential prompts asked by the user and how you may react to them via CLI commands.
 
-Basic message sending
+### Basic message sending
 
-> send the same message 2 times to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 (a nice message)
+```bash
+send the same message 2 times to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 (a nice message)
+```
 
-Group creation
+**cli commands:**
 
-> create a group with 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 and send 3 messages. add 3 random address to the group
+> yarn send --target 0x1234... --message "Hello!"
+
+### Group creation
+
+```bash
+create a group with 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 and send 3 messages. add 3 random address to the group
+```
+
+**cli commands:**
+
+> yarn groups create --name "My Group" --members 5
+> yarn groups add-members --group-id <group-id> --members 0x1234...,0x5678...
+> yarn send --group-id <group-id> --message "Hello!"
+
+### Debug address
+
+```bash
+get information for the address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
+```
+
+**cli commands:**
+
+> yarn debug address --address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5   
+
