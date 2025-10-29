@@ -16,18 +16,20 @@ import { validateGroupId } from "../utils/validation";
 import { CliManager } from "../cli/cli-manager";
 
 interface Config extends StandardCliParams {
-  operation: "conversations" | "members" | "messages";
+  operation: "conversations" | "members" | "messages" | "find";
   // Conversation ID for specific operations
   conversationId?: string;
   // Pagination options
   limit?: number;
   offset?: number;
+  // Find operation options
+  inboxId?: string;
 }
 
 function showHelp() {
   const customParams = {
     operation: {
-      flags: ["conversations", "members", "messages"],
+      flags: ["conversations", "members", "messages", "find"],
       type: "string" as const,
       description: "Operation to perform",
       required: true,
