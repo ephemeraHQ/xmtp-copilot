@@ -154,7 +154,7 @@ yarn content attachment --target 0x1234...
 
 ## Send transaction frame (USDC)
 yarn content transaction --target 0x1234... --amount 0.5
-
+´
 ## Send deeplink to create conversation
 yarn content deeplink --target 0x1234...
 

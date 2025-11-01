@@ -10,9 +10,9 @@ import {
   parseStandardArgs,
   generateHelpText,
   type StandardCliParams,
-} from "../cli/cli-params";
-import { type CliParam } from "../cli/cli-utils";
-import { CliManager } from "../cli/cli-manager";
+} from "../cli-params";
+import { type CliParam } from "../cli-utils";
+import { CliManager } from "../cli-manager";
 
 // USDCHandler placeholder - you'll need to add this based on your implementation
 class USDCHandler {

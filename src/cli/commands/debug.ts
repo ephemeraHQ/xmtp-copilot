@@ -5,7 +5,7 @@ import {
   parseStandardArgs,
   generateHelpText,
   type StandardCliParams,
-} from "../cli/cli-params";
+} from "../cli-params";
 import {
   getAgentInstance,
   logOperationStart,
@@ -14,11 +14,11 @@ import {
   logSectionHeader,
 } from "../core/agent";
 import { validateEthereumAddress } from "../utils/validation";
-import { CliManager } from "../cli/cli-manager";
+import { CliManager } from "../cli-manager";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json");
+const packageJson = require("../../../package.json");
 const xmtpSdkVersion: string =
   packageJson.dependencies["@xmtp/agent-sdk"] ?? "unknown";
 

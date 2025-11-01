@@ -4,7 +4,7 @@ import {
   parseStandardArgs,
   generateHelpText,
   type StandardCliParams,
-} from "../cli/cli-params";
+} from "../cli-params";
 import {
   getValidatedAgent,
   logOperationStart,
@@ -13,7 +13,7 @@ import {
   logSectionHeader,
 } from "../core/agent";
 import { validateGroupId } from "../utils/validation";
-import { CliManager } from "../cli/cli-manager";
+import { CliManager } from "../cli-manager";
 
 interface Config extends StandardCliParams {
   operation: "list" | "info" | "update-permissions";

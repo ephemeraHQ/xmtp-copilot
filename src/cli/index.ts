@@ -1,37 +1,23 @@
 #!/usr/bin/env node
 
+import { Command } from "commander";
 import { spawn } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// Get the root directory (where package.json is)
 const rootDir = join(__dirname, "..", "..");
 
-// Helper to run commands
-function runCommand(command: string, args: string[]): Promise<number> {
-  return new Promise((resolve) => {
-    const child = spawn(command, args, {
-      stdio: "inherit",
-      shell: true,
-      cwd: rootDir,
-    });
+const program = new Command();
 
-    child.on("close", (code) => {
-      resolve(code || 0);
-    });
+program
+  .name("xmtp")
+  .description("XMTP Copilot CLI - Manage XMTP protocol operations")
+  .version("0.0.1");
 
-    child.on("error", (error) => {
-      console.error(`Error: ${error.message}`);
-      resolve(1);
-    });
-  });
-}
-
-// Helper to run tsx commands using the local tsx binary
-async function runTsxCommand(scriptPath: string, args: string[] = []): Promise<number> {
+// Helper to run tsx commands
+function runTsxCommand(scriptPath: string, args: string[] = []): Promise<number> {
   const fullPath = join(rootDir, scriptPath);
   const tsxPath = join(rootDir, "node_modules", ".bin", "tsx");
   return new Promise((resolve) => {
@@ -52,107 +38,96 @@ async function runTsxCommand(scriptPath: string, args: string[] = []): Promise<n
   });
 }
 
-async function main() {
-  const args = process.argv.slice(2);
-  const command = args[0];
-  const commandArgs = args.slice(1);
+// Simple commands that just run other scripts
+program
+  .command("ai")
+  .description("Start Claude Code (AI coding assistant)")
+  .action(async () => {
+    console.log("🤖 Starting Claude Code...\n");
+    const child = spawn("claude", [], { stdio: "inherit", shell: true });
+    child.on("close", (code) => process.exit(code || 0));
+  });
 
-  // Show help if no command provided
-  if (!command || command === "--help" || command === "-h") {
-    console.log(`
-XMTP Copilot CLI - Manage XMTP protocol operations
+program
+  .command("start")
+  .description("Start XMTP and Slack channels (default)")
+  .action(async () => {
+    console.log("🚀 Starting XMTP Copilot channels...\n");
+    const child = spawn("yarn", ["start"], { stdio: "inherit", shell: true });
+    child.on("close", (code) => process.exit(code || 0));
+  });
 
-Usage: xmtp <command> [options]
+program
+  .command("xmtp")
+  .description("Start XMTP channel only")
+  .action(async () => {
+    console.log("🚀 Starting XMTP channel...\n");
+    const child = spawn("yarn", ["dev:xmtp"], { stdio: "inherit", shell: true });
+    child.on("close", (code) => process.exit(code || 0));
+  });
 
-Commands:
-  ai                 Start Claude Code (AI coding assistant)
-  start              Start XMTP and Slack channels (default)
-  groups             Manage XMTP groups and DMs
-  send               Send messages to conversations
-  debug              Debug and information commands
-  permissions        Manage group permissions
-  list               List conversations and messages
-  content            Content type operations
+program
+  .command("slack")
+  .description("Start Slack channel only")
+  .action(async () => {
+    console.log("🚀 Starting Slack channel...\n");
+    const child = spawn("yarn", ["dev:slack"], { stdio: "inherit", shell: true });
+    child.on("close", (code) => process.exit(code || 0));
+  });
 
-Channel Commands:
-  xmtp               Start XMTP channel only
-  slack              Start Slack channel only
+// Command files
+program
+  .command("groups")
+  .description("Manage XMTP groups and DMs")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/groups.ts", args);
+    process.exit(exitCode);
+  });
 
-Options:
-  --help, -h         Show this help message
+program
+  .command("send")
+  .description("Send messages to conversations")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/send.ts", args);
+    process.exit(exitCode);
+  });
 
-Examples:
-  xmtp ai                                       # Start Claude Code
-  xmtp start                                    # Start both channels
-  xmtp groups --members 5 --name "My Group"     # Create a group
-  xmtp send --target 0x123... --message "Hi!"   # Send a message
-  xmtp debug info                               # Get system information
+program
+  .command("debug")
+  .description("Debug and information commands")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/debug.ts", args);
+    process.exit(exitCode);
+  });
 
-For command-specific help:
-  xmtp <command> --help
-`);
-    process.exit(0);
-  }
+program
+  .command("permissions")
+  .description("Manage group permissions")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/permissions.ts", args);
+    process.exit(exitCode);
+  });
 
-  let exitCode = 0;
+program
+  .command("list")
+  .description("List conversations and messages")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/list.ts", args);
+    process.exit(exitCode);
+  });
 
-  switch (command) {
-    case "ai":
-      console.log("🤖 Starting Claude Code...\n");
-      exitCode = await runCommand("claude", commandArgs);
-      break;
+program
+  .command("content")
+  .description("Content type operations")
+  .argument("[args...]", "Command arguments")
+  .action(async (args) => {
+    const exitCode = await runTsxCommand("src/cli/commands/content-types.ts", args);
+    process.exit(exitCode);
+  });
 
-    case "start":
-      console.log("🚀 Starting XMTP Copilot channels...\n");
-      exitCode = await runCommand("yarn", ["start"]);
-      break;
-
-    case "xmtp":
-      console.log("🚀 Starting XMTP channel...\n");
-      exitCode = await runCommand("yarn", ["dev:xmtp"]);
-      break;
-
-    case "slack":
-      console.log("🚀 Starting Slack channel...\n");
-      exitCode = await runCommand("yarn", ["dev:slack"]);
-      break;
-
-    case "groups":
-      exitCode = await runTsxCommand("src/commands/groups.ts", commandArgs);
-      break;
-
-    case "send":
-      exitCode = await runTsxCommand("src/commands/send.ts", commandArgs);
-      break;
-
-    case "debug":
-      exitCode = await runTsxCommand("src/commands/debug.ts", commandArgs);
-      break;
-
-    case "permissions":
-      exitCode = await runTsxCommand("src/commands/permissions.ts", commandArgs);
-      break;
-
-    case "list":
-      exitCode = await runTsxCommand("src/commands/list.ts", commandArgs);
-      break;
-
-    case "content":
-      exitCode = await runTsxCommand("src/commands/content-types.ts", commandArgs);
-      break;
-
-    default:
-      console.error(`❌ Unknown command: ${command}`);
-      console.log(`Run 'xmtp --help' for usage information`);
-      exitCode = 1;
-      break;
-  }
-
-  process.exit(exitCode);
-}
-
-main().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
-});
-
+program.parse();

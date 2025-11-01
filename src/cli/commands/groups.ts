@@ -5,7 +5,7 @@ import {
   parseStandardArgs,
   generateHelpText,
   type StandardCliParams,
-} from "../cli/cli-params";
+} from "../cli-params";
 import {
   getAgentInstance,
   logOperationStart,
@@ -14,7 +14,7 @@ import {
   logSectionHeader,
 } from "../core/agent";
 import { validateEthereumAddress, validateGroupId } from "../utils/validation";
-import { CliManager } from "../cli/cli-manager";
+import { CliManager } from "../cli-manager";
 
 interface Config extends StandardCliParams {
   operation: "create" | "create-by-address" | "metadata";
