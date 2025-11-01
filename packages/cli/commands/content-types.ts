@@ -157,14 +157,28 @@ async function sendAttachmentContent(options: {
   target?: string;
   groupId?: string;
 }): Promise<void> {
-  const agent = await getAgent();
-  await getOrCreateConversation(options, agent);
-
-  // Simplified attachment - in practice you'd load a real file
   console.log(
-    `⚠️  Attachment sending requires file loading - simplified for now`,
+    `\n⚠️  Remote attachment sending requires a storage provider integration.\n`,
   );
-  console.log(`✅ Would send attachment content`);
+  console.log(
+    `The attachment content type is configured correctly with RemoteAttachmentCodec.`,
+  );
+  console.log(
+    `However, to actually send attachments, you need to integrate with a storage provider.\n`,
+  );
+  console.log(`📋 Implementation steps:`);
+  console.log(`   1. Load your file into memory as a Uint8Array`);
+  console.log(`   2. Encrypt it using RemoteAttachmentCodec.encodeEncrypted()`);
+  console.log(`   3. Upload encryptedEncoded.payload to your storage (IPFS, S3, etc.)`);
+  console.log(`   4. Get the HTTPS URL of the uploaded file`);
+  console.log(`   5. Create remoteAttachment object with the URL`);
+  console.log(`   6. Send using conversation.send(remoteAttachment, { contentType: ContentTypeRemoteAttachment })\n`);
+  
+  console.log(`📖 For examples, see:`);
+  console.log(`   https://github.com/ephemeraHQ/xmtp-agent-examples/tree/main/examples/xmtp-attachments\n`);
+  
+  console.log(`💡 The codec is properly configured in your agent setup.`);
+  console.log(`   Ready for you to implement the storage provider integration.\n`);
 }
 
 async function sendTransactionContent(options: {

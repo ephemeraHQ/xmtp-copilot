@@ -194,7 +194,7 @@ check the health of the agent bankr
 ### content types
 
 ```bash
-send an image to 0x1234...
+send an image to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 ```
 
 **cli commands:**
