@@ -131,8 +131,6 @@ async function runCreateByAddressOperation(config: {
     process.exit(1);
   }
 
-  console.log(`🚀 Creating group with ${config.memberAddresses.length} members...`);
-
   const agent = await getAgent();
   const groupName = config.groupName || `Address Group ${Date.now()}`;
   const groupDescription =
@@ -140,18 +138,34 @@ async function runCreateByAddressOperation(config: {
     "Group created by XMTP groups CLI using addresses";
 
   try {
-    const identifiers = config.memberAddresses.map((addr) => ({
-      identifier: addr,
-      identifierKind: IdentifierKind.Ethereum,
-    }));
+    // Start with the provided member addresses
+    let addresses = [...config.memberAddresses];
 
-    const group = (await agent.client.conversations.newGroupByIdentifiers(
-      identifiers,
-      {
-        groupName,
-        groupDescription,
-      },
-    )) as Group;
+    // If --members is specified, add random addresses to reach that count
+    if (config.members && config.members > addresses.length) {
+      const { default: agents } = await import("../../data/agents");
+      
+      // Get random addresses from agents that aren't already in the list
+      const existingAddresses = new Set(addresses.map(a => a.toLowerCase()));
+      const availableAddresses = agents
+        .map(a => a.address.toLowerCase())
+        .filter(addr => !existingAddresses.has(addr));
+      
+      // Shuffle and take what we need
+      const needed = config.members - addresses.length;
+      const randomAddresses = availableAddresses
+        .sort(() => Math.random() - 0.5)
+        .slice(0, needed);
+      
+      addresses = [...addresses, ...randomAddresses];
+    }
+
+    console.log(`🚀 Creating group with ${addresses.length} members...`);
+
+    const group = await agent.createGroupWithAddresses(addresses, {
+      groupName,
+      groupDescription,
+    });
 
     console.log(`✅ Group created: ${group.id}`);
     console.log(`📝 Name: ${group.name}`);
