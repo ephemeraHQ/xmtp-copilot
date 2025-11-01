@@ -141,8 +141,8 @@ async function runCreateByAddressOperation(config: {
     // Start with the provided member addresses
     let addresses = [...config.memberAddresses];
 
-    // If --members is specified, add random addresses to reach that count
-    if (config.members && config.members > addresses.length) {
+    // If --members is specified, add that many random addresses
+    if (config.members && config.members > 0) {
       const { default: agents } = await import("../../data/agents");
       
       // Get random addresses from agents that aren't already in the list
@@ -151,11 +151,14 @@ async function runCreateByAddressOperation(config: {
         .map(a => a.address.toLowerCase())
         .filter(addr => !existingAddresses.has(addr));
       
-      // Shuffle and take what we need
-      const needed = config.members - addresses.length;
+      // Shuffle and take the requested number of additional addresses
       const randomAddresses = availableAddresses
         .sort(() => Math.random() - 0.5)
-        .slice(0, needed);
+        .slice(0, config.members);
+      
+      if (randomAddresses.length < config.members) {
+        console.warn(`⚠️  Warning: Only ${randomAddresses.length} random addresses available (requested ${config.members})`);
+      }
       
       addresses = [...addresses, ...randomAddresses];
     }
