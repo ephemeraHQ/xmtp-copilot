@@ -116,6 +116,29 @@ async function runAddressOperation(options: {
     console.log(`   Inbox ID: ${targetInboxId}`);
     console.log(`   Installations: ${state.installations.length}`);
     console.log(`   Identifiers: ${state.identifiers.length}`);
+
+    // Show detailed installation information
+    if (state.installations.length > 0) {
+      console.log(`\n📱 Installations:`);
+      state.installations.forEach((inst: { id: string }, i: number) => {
+        console.log(`   ${i + 1}. ${inst.id}`);
+      });
+    }
+
+    // Show detailed identifier information
+    if (state.identifiers.length > 0) {
+      console.log(`\n🏷️  Identifiers:`);
+      state.identifiers.forEach((id: { identifier: string; identifierKind: number }, i: number) => {
+        console.log(
+          `   ${i + 1}. ${id.identifier} (kind: ${id.identifierKind})`,
+        );
+      });
+    }
+
+    // Show additional details if available
+    if (state.installations.length > 0) {
+      console.log(`\n💡 This address is active on the XMTP network with ${state.installations.length} installation(s).`);
+    }
   } catch (error) {
     console.error(
       `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -266,21 +289,28 @@ async function runInstallationsOperation(options: {
     process.exit(1);
   }
 
+  const agent = await getAgent();
+
   try {
     let targetInboxId: string;
 
     if (options.inboxId) {
       targetInboxId = options.inboxId;
     } else {
-      await Client.inboxStateFromInboxIds(
-        [],
-        (process.env.XMTP_ENV as XmtpEnv) ?? "dev",
+      const resolved = await agent.client.getInboxIdByIdentifier({
+        identifier: options.address!,
+        identifierKind: 0,
+      });
+
+      if (!resolved) {
+        console.error(`❌ No inbox found for address: ${options.address}`);
+        process.exit(1);
+      }
+
+      targetInboxId = resolved;
+      console.log(
+        `📍 Resolved ${options.address} to inbox ID: ${targetInboxId}`,
       );
-      // This would need the agent to resolve, simplified for now
-      console.error(
-        `❌ Address resolution not yet implemented for installations`,
-      );
-      process.exit(1);
     }
 
     const inboxState = await Client.inboxStateFromInboxIds(
