@@ -87,7 +87,7 @@ async function getAgent(): Promise<Agent> {
 async function sendGroupMessage(
   groupId: string,
   message: string,
-  sender?: string,
+  _sender?: string,
 ): Promise<void> {
   console.log(`📤 Sending message to group ${groupId}`);
 
@@ -157,11 +157,10 @@ async function runSendTask(
   try {
     const agent = await getAgent();
 
-    const conversation =
-      await agent.client.conversations.newDmWithIdentifier({
-        identifier: config.target,
-        identifierKind: IdentifierKind.Ethereum,
-      });
+    const conversation = await agent.client.conversations.newDmWithIdentifier({
+      identifier: config.target,
+      identifierKind: IdentifierKind.Ethereum,
+    });
 
     let responseTime = 0;
     let responsePromise: Promise<void> | null = null;
@@ -347,12 +346,14 @@ async function runSendTest(config: Config): Promise<void> {
       const files = fs.readdirSync(dataDir);
       const sendFiles = files.filter((file) => file.startsWith(`send-`));
       if (sendFiles.length > 0) {
-        console.log(`🧹 Cleaning up ${sendFiles.length} send test database files...`);
+        console.log(
+          `🧹 Cleaning up ${sendFiles.length} send test database files...`,
+        );
         for (const file of sendFiles) {
           fs.unlinkSync(path.join(dataDir, file));
         }
       }
-    } catch (error) {
+    } catch {
       // Ignore cleanup errors
     }
   }

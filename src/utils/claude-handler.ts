@@ -158,7 +158,7 @@ export class ClaudeHandler {
     return new Promise((resolve, reject) => {
       console.log("🚀 Spawning Claude CLI process...");
       console.log("🚀 Command: claude --print", JSON.stringify(prompt));
-      console.log("🚀 Full command: claude --print \"" + prompt + "\"");
+      console.log('🚀 Full command: claude --print "' + prompt + '"');
 
       // Add timeout to prevent hanging
       const timeout = setTimeout(() => {

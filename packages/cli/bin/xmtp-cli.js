@@ -8,9 +8,18 @@ import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const rootDir = join(__dirname, "..");
-const cliPath = join(rootDir, "packages", "cli", "index.ts");
-const tsxPath = join(rootDir, "node_modules", ".bin", "tsx");
+const cliPath = join(__dirname, "..", "index.ts");
+
+// Try to find tsx in node_modules
+const tsxPath = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "node_modules",
+  ".bin",
+  "tsx",
+);
 
 const child = spawn(tsxPath, [cliPath, ...process.argv.slice(2)], {
   stdio: "inherit",

@@ -13,7 +13,10 @@ program
   .argument("[operation]", "Operation: list, info, update-permissions", "list")
   .option("--group-id <id>", "Group ID (required)")
   .option("--features <features>", "Comma-separated features to update")
-  .option("--permissions <type>", "Permission type: everyone, disabled, admin-only, super-admin-only")
+  .option(
+    "--permissions <type>",
+    "Permission type: everyone, disabled, admin-only, super-admin-only",
+  )
   .action(async (operation, options) => {
     if (!options.groupId) {
       console.error(`❌ --group-id is required`);
@@ -71,7 +74,8 @@ async function getAgent(): Promise<Agent> {
 
 async function getGroup(groupId: string): Promise<Group> {
   const agent = await getAgent();
-  const conversation = await agent.client.conversations.getConversationById(groupId);
+  const conversation =
+    await agent.client.conversations.getConversationById(groupId);
   if (!conversation) {
     throw new Error(`Group not found: ${groupId}`);
   }
@@ -93,7 +97,9 @@ async function runListOperation(groupId: string): Promise<void> {
     console.log(`   Admins: ${admins.length}`);
     console.log(`   Super Admins: ${superAdmins.length}`);
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -110,7 +116,9 @@ async function runInfoOperation(groupId: string): Promise<void> {
     console.log(`   Image URL: ${group.imageUrl || "No image"}`);
     console.log(`   URL: https://xmtp.chat/conversations/${group.id}`);
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -172,7 +180,9 @@ async function runUpdatePermissionsOperation(config: {
 
     console.log(`✅ Updated ${config.features[0]} to ${config.permissions}`);
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }

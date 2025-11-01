@@ -1,4 +1,3 @@
-
 export interface AgentConfig {
   /** Agent name */
   name: string;

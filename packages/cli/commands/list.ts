@@ -10,7 +10,11 @@ const program = new Command();
 program
   .name("list")
   .description("List conversations and messages")
-  .argument("[operation]", "Operation: conversations, members, messages, find", "conversations")
+  .argument(
+    "[operation]",
+    "Operation: conversations, members, messages, find",
+    "conversations",
+  )
   .option("--conversation-id <id>", "Conversation ID")
   .option("--limit <count>", "Limit number of results", "50")
   .option("--offset <count>", "Offset for pagination", "0")
@@ -28,10 +32,19 @@ program
         await runMembersOperation(options.conversationId);
         break;
       case "messages":
-        await runMessagesOperation({ conversationId: options.conversationId, limit, offset });
+        await runMessagesOperation({
+          conversationId: options.conversationId,
+          limit,
+          offset,
+        });
         break;
       case "find":
-        await runFindOperation({ inboxId: options.inboxId, address: options.address, limit, offset });
+        await runFindOperation({
+          inboxId: options.inboxId,
+          address: options.address,
+          limit,
+          offset,
+        });
         break;
       default:
         console.error(`❌ Unknown operation: ${operation}`);
@@ -64,27 +77,39 @@ async function getAgent(): Promise<Agent> {
   });
 }
 
-async function runConversationsOperation(config: { limit: number; offset: number }): Promise<void> {
+async function runConversationsOperation(config: {
+  limit: number;
+  offset: number;
+}): Promise<void> {
   const agent = await getAgent();
 
   try {
     const conversations = await agent.client.conversations.list();
-    const paginated = conversations.slice(config.offset, config.offset + config.limit);
+    const paginated = conversations.slice(
+      config.offset,
+      config.offset + config.limit,
+    );
 
     console.log(`\n📋 Conversations:`);
     console.log(`   Total: ${conversations.length}`);
-    console.log(`   Showing: ${paginated.length} (offset: ${config.offset}, limit: ${config.limit})`);
+    console.log(
+      `   Showing: ${paginated.length} (offset: ${config.offset}, limit: ${config.limit})`,
+    );
 
     paginated.forEach((conv, i) => {
       const isGroup = "groupName" in conv;
-      console.log(`\n   ${i + 1 + config.offset}. ${isGroup ? "👥 Group" : "💬 DM"}: ${conv.id}`);
+      console.log(
+        `\n   ${i + 1 + config.offset}. ${isGroup ? "👥 Group" : "💬 DM"}: ${conv.id}`,
+      );
       if (isGroup) {
         const group = conv as Group;
         console.log(`      Name: ${group.name || "No name"}`);
       }
     });
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -98,7 +123,8 @@ async function runMembersOperation(conversationId?: string): Promise<void> {
   const agent = await getAgent();
 
   try {
-    const conversation = await agent.client.conversations.getConversationById(conversationId);
+    const conversation =
+      await agent.client.conversations.getConversationById(conversationId);
     if (!conversation) {
       console.error(`❌ Conversation not found`);
       process.exit(1);
@@ -119,7 +145,9 @@ async function runMembersOperation(conversationId?: string): Promise<void> {
       console.log(`   ${i + 1}. ${(member as any).inboxId || "Unknown"}`);
     });
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -137,26 +165,37 @@ async function runMessagesOperation(config: {
   const agent = await getAgent();
 
   try {
-    const conversation = await agent.client.conversations.getConversationById(config.conversationId);
+    const conversation = await agent.client.conversations.getConversationById(
+      config.conversationId,
+    );
     if (!conversation) {
       console.error(`❌ Conversation not found`);
       process.exit(1);
     }
 
     const messages = await conversation.messages();
-    const paginated = messages.slice(config.offset, config.offset + config.limit);
+    const paginated = messages.slice(
+      config.offset,
+      config.offset + config.limit,
+    );
 
     console.log(`\n📝 Messages:`);
     console.log(`   Total: ${messages.length}`);
-    console.log(`   Showing: ${paginated.length} (offset: ${config.offset}, limit: ${config.limit})`);
+    console.log(
+      `   Showing: ${paginated.length} (offset: ${config.offset}, limit: ${config.limit})`,
+    );
 
     paginated.forEach((msg, i) => {
-      console.log(`\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`);
+      console.log(
+        `\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`,
+      );
       console.log(`      From: ${msg.senderInboxId || "Unknown"}`);
       console.log(`      Content: ${msg.content}`);
     });
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -210,19 +249,26 @@ async function runFindOperation(config: {
     }
 
     const messages = await foundConversation.messages();
-    const paginated = messages.slice(config.offset, config.offset + config.limit);
+    const paginated = messages.slice(
+      config.offset,
+      config.offset + config.limit,
+    );
 
     console.log(`\n✅ Found conversation: ${foundConversation.id}`);
     console.log(`   Total messages: ${messages.length}`);
     console.log(`   Showing: ${paginated.length}`);
 
     paginated.forEach((msg, i) => {
-      console.log(`\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`);
+      console.log(
+        `\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`,
+      );
       console.log(`      From: ${msg.senderInboxId || "Unknown"}`);
       console.log(`      Content: ${msg.content}`);
     });
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }

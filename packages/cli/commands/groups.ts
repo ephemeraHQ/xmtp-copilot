@@ -10,7 +10,11 @@ const program = new Command();
 program
   .name("groups")
   .description("Manage XMTP groups and DMs")
-  .argument("[operation]", "Operation: create, create-by-address, metadata", "create")
+  .argument(
+    "[operation]",
+    "Operation: create, create-by-address, metadata",
+    "create",
+  )
   .option("--group-id <id>", "Group ID")
   .option("--name <name>", "Group name")
   .option("--description <desc>", "Group description")
@@ -89,33 +93,38 @@ async function runCreateOperation(config: {
   console.log(`🚀 Creating ${config.members === 1 ? "DM" : "group"}...`);
 
   const agent = await getAgent();
-  const groupName =
-    config.groupName ||
-    (config.members === 1 ? `DM ${Date.now()}` : `Test Group ${Date.now()}`);
-  const groupDescription =
-    config.groupDescription ||
-    (config.members === 1
-      ? "DM created by XMTP groups CLI"
-      : "Group created by XMTP groups CLI");
+  // const groupName =
+  //   config.groupName ||
+  //   (config.members === 1 ? `DM ${Date.now()}` : `Test Group ${Date.now()}`);
+  // const groupDescription =
+  //   config.groupDescription ||
+  //   (config.members === 1
+  //     ? "DM created by XMTP groups CLI"
+  //     : "Group created by XMTP groups CLI");
 
   try {
     // For now, just create a DM with target address if provided
     if (config.members === 1 && config.targetAddress) {
-      const conversation =
-        await agent.client.conversations.newDmWithIdentifier({
+      const conversation = await agent.client.conversations.newDmWithIdentifier(
+        {
           identifier: config.targetAddress,
           identifierKind: IdentifierKind.Ethereum,
-        });
+        },
+      );
 
       console.log(`✅ DM created: ${conversation.id}`);
       console.log(`🔗 URL: https://xmtp.chat/conversations/${conversation.id}`);
     } else {
-      console.error(`❌ Group creation with multiple members requires inbox IDs`);
+      console.error(
+        `❌ Group creation with multiple members requires inbox IDs`,
+      );
       console.log(`   Use create-by-address operation with --member-addresses`);
       process.exit(1);
     }
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -143,38 +152,45 @@ async function runCreateByAddressOperation(config: {
 
     // If --members is specified, add that many random addresses
     if (config.members && config.members > 0) {
-      const { default: agents } = await import("../../data/agents");
-      
+      const { default: agents } = await import("../../../data/agents");
+
       // Get random addresses from agents that aren't already in the list
-      const existingAddresses = new Set(addresses.map(a => a.toLowerCase()));
+      const existingAddresses = new Set(addresses.map((a) => a.toLowerCase()));
       const availableAddresses = agents
-        .map(a => a.address.toLowerCase())
-        .filter(addr => !existingAddresses.has(addr));
-      
+        .map((a) => a.address.toLowerCase())
+        .filter((addr) => !existingAddresses.has(addr));
+
       // Shuffle and take the requested number of additional addresses
       const randomAddresses = availableAddresses
         .sort(() => Math.random() - 0.5)
         .slice(0, config.members);
-      
+
       if (randomAddresses.length < config.members) {
-        console.warn(`⚠️  Warning: Only ${randomAddresses.length} random addresses available (requested ${config.members})`);
+        console.warn(
+          `⚠️  Warning: Only ${randomAddresses.length} random addresses available (requested ${config.members})`,
+        );
       }
-      
+
       addresses = [...addresses, ...randomAddresses];
     }
 
     console.log(`🚀 Creating group with ${addresses.length} members...`);
 
-    const group = await agent.createGroupWithAddresses(addresses, {
-      groupName,
-      groupDescription,
-    });
+    const group = await agent.createGroupWithAddresses(
+      addresses as `0x${string}`[],
+      {
+        groupName,
+        groupDescription,
+      },
+    );
 
     console.log(`✅ Group created: ${group.id}`);
     console.log(`📝 Name: ${group.name}`);
     console.log(`🔗 URL: https://xmtp.chat/conversations/${group.id}`);
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }
@@ -191,7 +207,9 @@ async function runMetadataOperation(config: {
   }
 
   if (!config.groupName && !config.groupDescription && !config.imageUrl) {
-    console.error(`❌ At least one of --name, --description, or --image-url is required`);
+    console.error(
+      `❌ At least one of --name, --description, or --image-url is required`,
+    );
     process.exit(1);
   }
 
@@ -226,7 +244,9 @@ async function runMetadataOperation(config: {
 
     console.log(`🔗 URL: https://xmtp.chat/conversations/${group.id}`);
   } catch (error) {
-    console.error(`❌ Failed: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `❌ Failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
     process.exit(1);
   }
 }

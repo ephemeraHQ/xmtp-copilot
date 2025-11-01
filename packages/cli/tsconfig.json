@@ -2,13 +2,11 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "allowJs": false,
-    "composite": false,
     "declaration": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["ESNext"],
     "module": "ESNext",
-    "baseUrl": "..",
     "moduleResolution": "Bundler",
     "noEmit": true,
     "resolveJsonModule": true,
@@ -17,13 +15,11 @@
     "strict": true,
     "esModuleInterop": true,
     "target": "ESNext",
-    "jsx": "react",
     "types": ["node"],
+    "baseUrl": "..",
     "paths": {
-      "@src/*": ["../src/*"],
-      "@xmtp-copilot/cli": ["../packages/cli/index.ts"],
-      "@xmtp-copilot/cli/*": ["../packages/cli/*"]
+      "@xmtp-copilot/data/*": ["../../data/*"]
     }
   },
-  "include": ["../src/**/*.ts", "../scripts/**/*.ts", "../packages/cli/**/*.ts"]
+  "include": ["**/*.ts"]
 }

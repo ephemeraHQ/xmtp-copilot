@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "XMTP Copilot - CLI commands and Slack bot integration for XMTP protocol testing and management",
   "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "bin": {
     "xmtp": "./bin/xmtp.js"
   },
@@ -15,12 +19,12 @@
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .xmtp/ ||: && rimraf logs/ ||  :",
     "chat": "tsx scripts/chat-cli.tsx",
-    "send": "tsx src/cli/commands/send.ts",
-    "permissions": "tsx src/cli/commands/permissions.ts",
-    "groups": "tsx src/cli/commands/groups.ts",
-    "list": "tsx src/cli/commands/list.ts",
-    "debug": "tsx src/cli/commands/debug.ts",
-    "content": "tsx src/cli/commands/content-types.ts",
+    "send": "tsx packages/cli/commands/send.ts",
+    "permissions": "tsx packages/cli/commands/permissions.ts",
+    "groups": "tsx packages/cli/commands/groups.ts",
+    "list": "tsx packages/cli/commands/list.ts",
+    "debug": "tsx packages/cli/commands/debug.ts",
+    "content": "tsx packages/cli/commands/content-types.ts",
     "format": "prettier -w .",
     "lint": "eslint . --config config/eslint.config.js"
   },

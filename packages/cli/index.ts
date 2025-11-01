@@ -17,7 +17,10 @@ program
   .version("0.0.1");
 
 // Helper to run tsx commands
-function runTsxCommand(scriptPath: string, args: string[] = []): Promise<number> {
+function runTsxCommand(
+  scriptPath: string,
+  args: string[] = [],
+): Promise<number> {
   const fullPath = join(rootDir, scriptPath);
   const tsxPath = join(rootDir, "node_modules", ".bin", "tsx");
   return new Promise((resolve) => {
@@ -62,7 +65,10 @@ program
   .description("Start XMTP channel only")
   .action(async () => {
     console.log("🚀 Starting XMTP channel...\n");
-    const child = spawn("yarn", ["dev:xmtp"], { stdio: "inherit", shell: true });
+    const child = spawn("yarn", ["dev:xmtp"], {
+      stdio: "inherit",
+      shell: true,
+    });
     child.on("close", (code) => process.exit(code || 0));
   });
 
@@ -71,7 +77,10 @@ program
   .description("Start Slack channel only")
   .action(async () => {
     console.log("🚀 Starting Slack channel...\n");
-    const child = spawn("yarn", ["dev:slack"], { stdio: "inherit", shell: true });
+    const child = spawn("yarn", ["dev:slack"], {
+      stdio: "inherit",
+      shell: true,
+    });
     child.on("close", (code) => process.exit(code || 0));
   });
 
@@ -81,7 +90,10 @@ program
   .description("Manage XMTP groups and DMs")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/groups.ts", args);
+    const exitCode = await runTsxCommand(
+      "packages/cli/commands/groups.ts",
+      args,
+    );
     process.exit(exitCode);
   });
 
@@ -90,7 +102,7 @@ program
   .description("Send messages to conversations")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/send.ts", args);
+    const exitCode = await runTsxCommand("packages/cli/commands/send.ts", args);
     process.exit(exitCode);
   });
 
@@ -99,7 +111,10 @@ program
   .description("Debug and information commands")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/debug.ts", args);
+    const exitCode = await runTsxCommand(
+      "packages/cli/commands/debug.ts",
+      args,
+    );
     process.exit(exitCode);
   });
 
@@ -108,7 +123,10 @@ program
   .description("Manage group permissions")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/permissions.ts", args);
+    const exitCode = await runTsxCommand(
+      "packages/cli/commands/permissions.ts",
+      args,
+    );
     process.exit(exitCode);
   });
 
@@ -117,7 +135,7 @@ program
   .description("List conversations and messages")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/list.ts", args);
+    const exitCode = await runTsxCommand("packages/cli/commands/list.ts", args);
     process.exit(exitCode);
   });
 
@@ -126,7 +144,10 @@ program
   .description("Content type operations")
   .argument("[args...]", "Command arguments")
   .action(async (args) => {
-    const exitCode = await runTsxCommand("src/cli/commands/content-types.ts", args);
+    const exitCode = await runTsxCommand(
+      "packages/cli/commands/content-types.ts",
+      args,
+    );
     process.exit(exitCode);
   });
 

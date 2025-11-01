@@ -4,8 +4,6 @@ import { Command } from "commander";
 import { Agent } from "@xmtp/agent-sdk";
 import { IdentifierKind } from "@xmtp/node-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import { ContentTypeRemoteAttachment } from "@xmtp/content-type-remote-attachment";
-import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
 import { ContentTypeReply } from "@xmtp/content-type-reply";
 import { ContentTypeReaction } from "@xmtp/content-type-reaction";
 import "dotenv/config";
@@ -15,7 +13,11 @@ const program = new Command();
 program
   .name("content")
   .description("Content type operations")
-  .argument("[operation]", "Operation: text, markdown, attachment, transaction, deeplink, miniapp", "text")
+  .argument(
+    "[operation]",
+    "Operation: text, markdown, attachment, transaction, deeplink, miniapp",
+    "text",
+  )
   .option("--target <address>", "Target wallet address")
   .option("--group-id <id>", "Group ID")
   .option("--amount <amount>", "Amount for transaction", "0.1")
@@ -80,7 +82,9 @@ async function getOrCreateConversation(
   agent: Agent,
 ) {
   if (options.groupId) {
-    const conversation = await agent.client.conversations.getConversationById(options.groupId);
+    const conversation = await agent.client.conversations.getConversationById(
+      options.groupId,
+    );
     if (!conversation) {
       throw new Error(`Group not found: ${options.groupId}`);
     }
@@ -93,7 +97,10 @@ async function getOrCreateConversation(
   }
 }
 
-async function sendTextContent(options: { target?: string; groupId?: string }): Promise<void> {
+async function sendTextContent(options: {
+  target?: string;
+  groupId?: string;
+}): Promise<void> {
   const agent = await getAgent();
   const conversation = await getOrCreateConversation(options, agent);
 
@@ -127,7 +134,10 @@ async function sendTextContent(options: { target?: string; groupId?: string }): 
   console.log(`✅ Sent text, reply, and reaction`);
 }
 
-async function sendMarkdownContent(options: { target?: string; groupId?: string }): Promise<void> {
+async function sendMarkdownContent(options: {
+  target?: string;
+  groupId?: string;
+}): Promise<void> {
   const agent = await getAgent();
   const conversation = await getOrCreateConversation(options, agent);
 
@@ -143,12 +153,17 @@ This is **markdown** formatted text!
   console.log(`✅ Sent markdown content`);
 }
 
-async function sendAttachmentContent(options: { target?: string; groupId?: string }): Promise<void> {
+async function sendAttachmentContent(options: {
+  target?: string;
+  groupId?: string;
+}): Promise<void> {
   const agent = await getAgent();
-  const conversation = await getOrCreateConversation(options, agent);
+  await getOrCreateConversation(options, agent);
 
   // Simplified attachment - in practice you'd load a real file
-  console.log(`⚠️  Attachment sending requires file loading - simplified for now`);
+  console.log(
+    `⚠️  Attachment sending requires file loading - simplified for now`,
+  );
   console.log(`✅ Would send attachment content`);
 }
 
@@ -158,14 +173,19 @@ async function sendTransactionContent(options: {
   amount?: string;
 }): Promise<void> {
   const agent = await getAgent();
-  const conversation = await getOrCreateConversation(options, agent);
+  await getOrCreateConversation(options, agent);
 
   // Simplified transaction - in practice you'd create proper wallet send calls
-  console.log(`⚠️  Transaction sending requires wallet integration - simplified for now`);
+  console.log(
+    `⚠️  Transaction sending requires wallet integration - simplified for now`,
+  );
   console.log(`✅ Would send transaction content`);
 }
 
-async function sendDeeplinkContent(options: { target?: string; groupId?: string }): Promise<void> {
+async function sendDeeplinkContent(options: {
+  target?: string;
+  groupId?: string;
+}): Promise<void> {
   const agent = await getAgent();
   const conversation = await getOrCreateConversation(options, agent);
 
@@ -176,7 +196,10 @@ async function sendDeeplinkContent(options: { target?: string; groupId?: string 
   console.log(`✅ Sent deeplink`);
 }
 
-async function sendMiniAppContent(options: { target?: string; groupId?: string }): Promise<void> {
+async function sendMiniAppContent(options: {
+  target?: string;
+  groupId?: string;
+}): Promise<void> {
   const agent = await getAgent();
   const conversation = await getOrCreateConversation(options, agent);
 

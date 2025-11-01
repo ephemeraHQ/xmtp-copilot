@@ -47,11 +47,13 @@ yarn groups metadata --group-id <id> --image-url "https://example.com/image.jpg"
 ```
 
 **Operations:**
+
 - `create` - Create DMs or groups with members (default)
 - `create-by-address` - Create groups using Ethereum addresses
 - `metadata` - Update group name, description, or image
 
 **Options:**
+
 - `--group-id <id>` - Group ID for metadata operations
 - `--name <name>` - Group name
 - `--description <desc>` - Group description
@@ -82,6 +84,7 @@ yarn send --target 0x1234... --users 10 --wait
 ```
 
 **Options:**
+
 - `--target <address>` - Target wallet address
 - `--group-id <id>` - Group ID
 - `--message <text>` - Message text
@@ -120,6 +123,7 @@ yarn debug installations --inbox-id abc...
 ```
 
 **Operations:**
+
 - `info` - General agent information (default)
 - `address` - Address information and installations
 - `inbox` - Inbox information and identifiers
@@ -128,6 +132,7 @@ yarn debug installations --inbox-id abc...
 - `installations` - Installation details
 
 **Options:**
+
 - `--address <address>` - Ethereum address
 - `--inbox-id <id>` - Inbox ID
 
@@ -147,16 +152,19 @@ yarn permissions update-permissions --group-id <id> --features update-metadata -
 ```
 
 **Operations:**
+
 - `list` - List members and permissions (default)
 - `info` - Get detailed group information
 - `update-permissions` - Update permission policies
 
 **Options:**
+
 - `--group-id <id>` - Group ID (required)
 - `--features <features>` - Comma-separated features to update
 - `--permissions <type>` - Permission type: `everyone`, `disabled`, `admin-only`, `super-admin-only`
 
 **Available Features:**
+
 - `add-member` - Adding members to group
 - `remove-member` - Removing members from group
 - `add-admin` - Promoting members to admin
@@ -186,12 +194,14 @@ yarn list find --address 0x1234...
 ```
 
 **Operations:**
+
 - `conversations` - List all conversations (default)
 - `members` - List members of a conversation
 - `messages` - List messages in a conversation
 - `find` - Find conversation by inbox ID or address
 
 **Options:**
+
 - `--conversation-id <id>` - Conversation ID
 - `--limit <count>` - Maximum results (default: 50)
 - `--offset <count>` - Pagination offset (default: 0)
@@ -217,6 +227,7 @@ yarn content text --group-id abc123...
 ```
 
 **Operations:**
+
 - `text` - Text with reply and reaction (default)
 - `markdown` - Markdown formatted content
 - `attachment` - Remote attachments
@@ -225,6 +236,7 @@ yarn content text --group-id abc123...
 - `miniapp` - Mini app URLs
 
 **Options:**
+
 - `--target <address>` - Target wallet address
 - `--group-id <id>` - Group ID
 - `--amount <amount>` - Amount for transactions (default: 0.1)
@@ -244,7 +256,7 @@ XMTP_DB_ENCRYPTION_KEY=...      # Database encryption key
 The CLI uses a minimal architecture built with Commander.js:
 
 ```
-src/cli/
+packages/cli/
 ├── index.ts           # Main CLI entry point
 └── commands/          # Individual command files
     ├── groups.ts
@@ -256,6 +268,7 @@ src/cli/
 ```
 
 Each command file:
+
 1. Uses Commander.js for argument parsing
 2. Creates its own Agent instance via `Agent.createFromEnv()`
 3. Implements only the essential command logic
@@ -326,15 +339,17 @@ yarn list messages --conversation-id <id> --limit 20
 ## Troubleshooting
 
 **"Agent creation failed"**
+
 - Check your `.env` file has `XMTP_WALLET_KEY` and `XMTP_DB_ENCRYPTION_KEY`
 - Verify `XMTP_ENV` is set to correct environment (local/dev/production)
 
 **"No conversations found"**
+
 - Run `yarn debug info` to verify agent setup
 - Check you're using the correct environment
 
 **"Group not found"**
+
 - Verify the group ID is correct
 - Ensure you have access to the group
 - Check environment matches the group's environment
-
