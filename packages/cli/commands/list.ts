@@ -240,14 +240,41 @@ async function runFindOperation(config: {
       targetInboxId = resolved;
     }
 
-    const conversations = await agent.client.conversations.list();
-    let foundConversation = null;
+    // First, try to get a direct DM conversation
+    let foundConversation =
+      await agent.client.conversations.getDmByInboxId(targetInboxId);
 
-    for (const conv of conversations) {
-      const messages = await conv.messages();
-      if (messages.length > 0 && messages[0].senderInboxId === targetInboxId) {
-        foundConversation = conv;
-        break;
+    // If no DM found, search through all conversations (including groups)
+    if (!foundConversation) {
+      const conversations = await agent.client.conversations.list();
+
+      for (const conv of conversations) {
+        const isGroup = "groupName" in conv;
+
+        if (isGroup) {
+          // For groups, check if the target is a member
+          const group = conv as Group;
+          const members = await group.members();
+          const isMember = members.some(
+            (member: any) => member.inboxId === targetInboxId,
+          );
+
+          if (isMember) {
+            foundConversation = conv;
+            break;
+          }
+        } else {
+          // For DMs, check if any message involves the target inbox ID
+          const messages = await conv.messages();
+          const involvesTarget = messages.some(
+            (msg) => msg.senderInboxId === targetInboxId,
+          );
+
+          if (involvesTarget) {
+            foundConversation = conv;
+            break;
+          }
+        }
       }
     }
 
@@ -262,7 +289,11 @@ async function runFindOperation(config: {
       config.offset + config.limit,
     );
 
+    const isGroup = "groupName" in foundConversation;
+    const conversationType = isGroup ? "Group" : "Direct Message";
+
     console.log(`\n✅ Found conversation: ${foundConversation.id}`);
+    console.log(`   Type: ${conversationType}`);
     console.log(`   Total messages: ${messages.length}`);
     console.log(`   Showing: ${paginated.length}`);
 
