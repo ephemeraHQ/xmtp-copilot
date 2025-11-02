@@ -7,7 +7,15 @@ import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { ContentTypeReply } from "@xmtp/content-type-reply";
 import { ContentTypeReaction } from "@xmtp/content-type-reaction";
 import { ContentTypeText } from "@xmtp/content-type-text";
-import "dotenv/config";
+import { config as dotenvConfig } from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+// Load .env from project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, "../..", "..");
+dotenvConfig({ path: join(rootDir, ".env") });
 
 const program = new Command();
 
