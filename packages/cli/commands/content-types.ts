@@ -6,6 +6,7 @@ import { IdentifierKind } from "@xmtp/node-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { ContentTypeReply } from "@xmtp/content-type-reply";
 import { ContentTypeReaction } from "@xmtp/content-type-reaction";
+import { ContentTypeText } from "@xmtp/content-type-text";
 import "dotenv/config";
 
 const program = new Command();
@@ -56,6 +57,7 @@ async function getAgent(): Promise<Agent> {
   const { MarkdownCodec } = await import("@xmtp/content-type-markdown");
   const { ReactionCodec } = await import("@xmtp/content-type-reaction");
   const { ReplyCodec } = await import("@xmtp/content-type-reply");
+  const { TextCodec } = await import("@xmtp/content-type-text");
   const { RemoteAttachmentCodec, AttachmentCodec } = await import(
     "@xmtp/content-type-remote-attachment"
   );
@@ -67,6 +69,7 @@ async function getAgent(): Promise<Agent> {
     dbPath: (inboxId) =>
       `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
     codecs: [
+      new TextCodec(),
       new MarkdownCodec(),
       new ReactionCodec(),
       new ReplyCodec(),
@@ -114,7 +117,7 @@ async function sendTextContent(options: {
     {
       content: "💬 This is a reply!",
       reference: lastMessage.id,
-      contentType: "text/plain",
+      contentType: ContentTypeText,
     },
     ContentTypeReply,
   );
