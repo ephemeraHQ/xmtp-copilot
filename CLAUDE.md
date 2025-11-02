@@ -199,7 +199,7 @@ send an image to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 **cli commands:**
 
-> yarn content attachment --target 0x1234...
+> yarn content attachment --target 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 ### fetch latest messages from a conversation
 

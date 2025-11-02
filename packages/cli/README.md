@@ -13,20 +13,6 @@ xmtp debug info
 
 ## Commands Overview
 
-### Channel Commands
-
-```bash
-# Start both XMTP and Slack channels
-xmtp start
-
-# Start individual channels
-xmtp xmtp    # XMTP channel only
-xmtp slack   # Slack channel only
-
-# Start Claude AI assistant
-xmtp ai
-```
-
 ### Groups Command
 
 Manage XMTP groups and direct messages.
