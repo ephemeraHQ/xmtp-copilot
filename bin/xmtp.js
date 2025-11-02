@@ -15,6 +15,7 @@ const tsxPath = join(rootDir, "node_modules", ".bin", "tsx");
 const child = spawn(tsxPath, [cliPath, ...process.argv.slice(2)], {
   stdio: "inherit",
   shell: false,
+  cwd: rootDir,
 });
 
 child.on("exit", (code) => {
