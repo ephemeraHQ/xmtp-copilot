@@ -1,10 +1,16 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { logDetails } from "@xmtp/agent-sdk/debug";
-import { ContentTypeMarkdown, MarkdownCodec } from "@xmtp/content-type-markdown";
+import {
+  ContentTypeMarkdown,
+  MarkdownCodec,
+} from "@xmtp/content-type-markdown";
 import { ClaudeHandler, SessionManager } from "../utils/claude-handler";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import { ReplyCodec } from "@xmtp/content-type-reply";
-import { AttachmentCodec, RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
+import {
+  AttachmentCodec,
+  RemoteAttachmentCodec,
+} from "@xmtp/content-type-remote-attachment";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 
 // Load .env file only in local development
@@ -20,7 +26,7 @@ const agent = await Agent.createFromEnv({
     new RemoteAttachmentCodec(),
     new AttachmentCodec(),
     new WalletSendCallsCodec(),
-  ],          
+  ],
 });
 
 // Initialize Claude handler and session manager

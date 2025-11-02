@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "XMTP Copilot - CLI commands and Slack bot integration for XMTP protocol testing and management",
   "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "bin": {
     "xmtp": "./bin/xmtp.js"
   },
@@ -15,12 +19,12 @@
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .xmtp/ ||: && rimraf logs/ ||  :",
     "chat": "tsx scripts/chat-cli.tsx",
-    "send": "tsx src/commands/send.ts",
-    "permissions": "tsx src/commands/permissions.ts",
-    "groups": "tsx src/commands/groups.ts",
-    "list": "tsx src/commands/list.ts",
-    "debug": "tsx src/commands/debug.ts",
-    "content": "tsx src/commands/content-types.ts",
+    "send": "yarn workspace @xmtp-copilot/cli send",
+    "permissions": "yarn workspace @xmtp-copilot/cli permissions",
+    "groups": "yarn workspace @xmtp-copilot/cli groups",
+    "list": "yarn workspace @xmtp-copilot/cli list",
+    "debug": "yarn workspace @xmtp-copilot/cli debug",
+    "content": "yarn workspace @xmtp-copilot/cli content",
     "format": "prettier -w .",
     "lint": "eslint . --config config/eslint.config.js"
   },
@@ -33,7 +37,10 @@
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
+    "@xmtp/content-type-remote-attachment": "^2.0.0",
+    "@xmtp/content-type-text": "^2.0.2",
     "@xmtp/content-type-wallet-send-calls": "^2.0.0",
+    "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "ink": "^6.3.1",
     "ink-text-input": "^6.0.0",

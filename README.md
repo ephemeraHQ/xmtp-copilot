@@ -8,7 +8,6 @@ xmtp ai
 
 ![](./screenshot.png)
 
-
 ## Usage
 
 After installation, use the `xmtp` command from anywhere:
