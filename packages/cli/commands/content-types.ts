@@ -3,10 +3,15 @@
 import { Command } from "commander";
 import { Agent } from "@xmtp/agent-sdk";
 import { IdentifierKind } from "@xmtp/node-sdk";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import { ContentTypeReply } from "@xmtp/content-type-reply";
-import { ContentTypeReaction } from "@xmtp/content-type-reaction";
-import { ContentTypeText } from "@xmtp/content-type-text";
+import { ContentTypeMarkdown, MarkdownCodec } from "@xmtp/content-type-markdown";
+import { ContentTypeReply, ReplyCodec } from "@xmtp/content-type-reply";
+import { ContentTypeReaction, ReactionCodec } from "@xmtp/content-type-reaction";
+import { ContentTypeText, TextCodec } from "@xmtp/content-type-text";
+import {
+  RemoteAttachmentCodec,
+  AttachmentCodec,
+} from "@xmtp/content-type-remote-attachment";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import { config as dotenvConfig } from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -62,17 +67,6 @@ program
   });
 
 async function getAgent(): Promise<Agent> {
-  const { MarkdownCodec } = await import("@xmtp/content-type-markdown");
-  const { ReactionCodec } = await import("@xmtp/content-type-reaction");
-  const { ReplyCodec } = await import("@xmtp/content-type-reply");
-  const { TextCodec } = await import("@xmtp/content-type-text");
-  const { RemoteAttachmentCodec, AttachmentCodec } = await import(
-    "@xmtp/content-type-remote-attachment"
-  );
-  const { WalletSendCallsCodec } = await import(
-    "@xmtp/content-type-wallet-send-calls"
-  );
-
   return Agent.createFromEnv({
     dbPath: (inboxId) =>
       `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? join(rootDir, ".xmtp")}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
