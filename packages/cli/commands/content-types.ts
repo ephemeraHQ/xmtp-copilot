@@ -75,7 +75,7 @@ async function getAgent(): Promise<Agent> {
 
   return Agent.createFromEnv({
     dbPath: (inboxId) =>
-      `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+      `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? join(rootDir, ".xmtp")}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
     codecs: [
       new TextCodec(),
       new MarkdownCodec(),
