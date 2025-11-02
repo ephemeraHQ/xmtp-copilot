@@ -2,7 +2,7 @@
 
 import { Command } from "commander";
 import { Agent } from "@xmtp/agent-sdk";
-import { type Group } from "@xmtp/node-sdk";
+import { type Group, type Dm } from "@xmtp/node-sdk";
 import { config as dotenvConfig } from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -241,7 +241,7 @@ async function runFindOperation(config: {
     }
 
     // First, try to get a direct DM conversation
-    let foundConversation =
+    let foundConversation: Group | Dm | undefined =
       await agent.client.conversations.getDmByInboxId(targetInboxId);
 
     // If no DM found, search through all conversations (including groups)
