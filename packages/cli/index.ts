@@ -45,7 +45,7 @@ function runTsxCommand(
 program
   .command("ai")
   .description("Start Claude Code (AI coding assistant)")
-  .action(async () => {
+  .action(() => {
     console.log("🤖 Starting Claude Code...\n");
     const child = spawn("claude", [], { stdio: "inherit", shell: true });
     child.on("close", (code) => process.exit(code || 0));
@@ -54,7 +54,7 @@ program
 program
   .command("start")
   .description("Start XMTP and Slack channels (default)")
-  .action(async () => {
+  .action(() => {
     console.log("🚀 Starting XMTP Copilot channels...\n");
     const child = spawn("yarn", ["start"], { stdio: "inherit", shell: true });
     child.on("close", (code) => process.exit(code || 0));
@@ -63,7 +63,7 @@ program
 program
   .command("xmtp")
   .description("Start XMTP channel only")
-  .action(async () => {
+  .action(() => {
     console.log("🚀 Starting XMTP channel...\n");
     const child = spawn("yarn", ["dev:xmtp"], {
       stdio: "inherit",
@@ -75,7 +75,7 @@ program
 program
   .command("slack")
   .description("Start Slack channel only")
-  .action(async () => {
+  .action(() => {
     console.log("🚀 Starting Slack channel...\n");
     const child = spawn("yarn", ["dev:slack"], {
       stdio: "inherit",
@@ -89,7 +89,7 @@ program
   .command("groups")
   .description("Manage XMTP groups and DMs")
   .argument("[args...]", "Command arguments")
-  .action(async (args) => {
+  .action(async (args: string[]) => {
     const exitCode = await runTsxCommand(
       "packages/cli/commands/groups.ts",
       args,

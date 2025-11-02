@@ -33,7 +33,17 @@ program
   .option("--attempts <count>", "Number of attempts", "1")
   .option("--threshold <percent>", "Success threshold percentage", "95")
   .option("--wait", "Wait for responses from target")
-  .action(async (options) => {
+  .action(async (options: {
+    target?: string;
+    groupId?: string;
+    message?: string;
+    users?: string;
+    attempts?: string;
+    threshold?: string;
+    wait?: boolean;
+    customMessage?: string;
+    sender?: string;
+  }) => {
     // Validation
     if (!options.target && !options.groupId) {
       console.error("❌ Error: Either --target or --group-id is required");
@@ -45,13 +55,17 @@ program
       process.exit(1);
     }
 
-    const userCount = parseInt(options.users) || 1;
-    const attempts = parseInt(options.attempts) || 1;
-    const threshold = parseInt(options.threshold) || 95;
+    const userCount = parseInt(options.users ?? "1") || 1;
+    const attempts = parseInt(options.attempts ?? "1") || 1;
+    const threshold = parseInt(options.threshold ?? "95") || 95;
     const awaitResponse = !!options.wait;
     const timeout = 120 * 1000; // 120 seconds
 
     if (options.groupId) {
+      if (!options.message) {
+        console.error("❌ Error: --message is required when using --group-id");
+        process.exit(1);
+      }
       await sendGroupMessage(options.groupId, options.message, options.sender);
     } else {
       await runSendTest({
@@ -110,12 +124,12 @@ async function sendGroupMessage(
     console.log(`📋 Found ${conversations.length} conversations`);
 
     const group = conversations.find(
-      (conv: any) => conv.id === groupId,
-    ) as Group;
+      (conv) => conv.id === groupId,
+    ) as Group | undefined;
     if (!group) {
       console.error(`❌ Group with ID ${groupId} not found`);
       console.log(`📋 Available conversation IDs:`);
-      conversations.forEach((conv: any) => {
+      conversations.forEach((conv) => {
         console.log(`   - ${conv.id}`);
       });
       process.exit(1);

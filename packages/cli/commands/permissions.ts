@@ -25,7 +25,11 @@ program
     "--permissions <type>",
     "Permission type: everyone, disabled, admin-only, super-admin-only",
   )
-  .action(async (operation, options) => {
+  .action(async (operation, options: {
+    groupId?: string;
+    features?: string;
+    permissions?: string;
+  }) => {
     if (!options.groupId) {
       console.error(`❌ --group-id is required`);
       process.exit(1);
@@ -166,15 +170,21 @@ async function runUpdatePermissionsOperation(config: {
     await group.sync();
 
     const agent = await getAgent();
-    const isSuperAdmin = await group.isSuperAdmin(agent.client.inboxId);
+    const inboxId = agent.client.inboxId;
+    if (!inboxId) {
+      console.error(`❌ Agent inbox ID is required`);
+      process.exit(1);
+    }
+    const isSuperAdmin = await group.isSuperAdmin(inboxId);
 
     if (!isSuperAdmin) {
       console.error(`❌ Only super admins can change permissions`);
       process.exit(1);
     }
 
-    const permissionType = PERMISSION_TYPES[config.features[0]];
-    const permissionPolicy = PERMISSION_POLICIES[config.permissions];
+    const firstFeature = config.features[0];
+    const permissionType = firstFeature ? PERMISSION_TYPES[firstFeature] : undefined;
+    const permissionPolicy = config.permissions ? PERMISSION_POLICIES[config.permissions] : undefined;
 
     if (permissionType === undefined || permissionPolicy === undefined) {
       console.error(`❌ Invalid feature or permission type`);

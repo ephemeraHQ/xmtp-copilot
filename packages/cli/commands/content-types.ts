@@ -40,7 +40,7 @@ program
   .option("--target <address>", "Target wallet address")
   .option("--group-id <id>", "Group ID")
   .option("--amount <amount>", "Amount for transaction", "0.1")
-  .action(async (operation, options) => {
+  .action(async (operation, options: { target?: string; groupId?: string; amount?: string }) => {
     if (!options.target && !options.groupId) {
       console.error(`❌ Either --target or --group-id is required`);
       process.exit(1);
@@ -100,8 +100,11 @@ async function getOrCreateConversation(
     }
     return conversation;
   } else {
+    if (!options.target) {
+      throw new Error("Target is required when groupId is not provided");
+    }
     return await agent.client.conversations.newDmWithIdentifier({
-      identifier: options.target!,
+      identifier: options.target,
       identifierKind: IdentifierKind.Ethereum,
     });
   }

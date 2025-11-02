@@ -2,7 +2,7 @@
 
 import { Command } from "commander";
 import { Agent } from "@xmtp/agent-sdk";
-import { Client, XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { config as dotenvConfig } from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -25,7 +25,7 @@ program
   )
   .option("--address <address>", "Ethereum address")
   .option("--inbox-id <id>", "Inbox ID")
-  .action(async (operation, options) => {
+  .action(async (operation, options: { address?: string; inboxId?: string }) => {
     switch (operation) {
       case "address":
         await runAddressOperation(options);
@@ -106,7 +106,11 @@ async function runAddressOperation(options: {
         `📍 Resolved ${options.address} to inbox ID: ${targetInboxId}`,
       );
     } else {
-      targetInboxId = options.inboxId!;
+      if (!options.inboxId) {
+        console.error(`❌ Inbox ID is required`);
+        process.exit(1);
+      }
+      targetInboxId = options.inboxId;
     }
 
     const inboxState = await agent.client.preferences.inboxStateFromInboxIds(
@@ -120,6 +124,10 @@ async function runAddressOperation(options: {
     }
 
     const state = inboxState[0];
+    if (!state) {
+      console.error(`❌ Invalid inbox state`);
+      process.exit(1);
+    }
     console.log(`\n📊 Address Information:`);
     console.log(`   Inbox ID: ${targetInboxId}`);
     console.log(`   Installations: ${state.installations.length}`);
@@ -172,8 +180,12 @@ async function runInboxOperation(options: {
     if (options.inboxId) {
       targetInboxId = options.inboxId;
     } else {
+      if (!options.address) {
+        console.error(`❌ Address is required`);
+        process.exit(1);
+      }
       const resolved = await agent.client.getInboxIdByIdentifier({
-        identifier: options.address!,
+        identifier: options.address,
         identifierKind: 0,
       });
 
@@ -196,6 +208,10 @@ async function runInboxOperation(options: {
     }
 
     const state = inboxState[0];
+    if (!state) {
+      console.error(`❌ Invalid inbox state`);
+      process.exit(1);
+    }
     console.log(`\n📊 Inbox Information:`);
     console.log(`   Inbox ID: ${targetInboxId}`);
     console.log(`   Installations: ${state.installations.length}`);
@@ -244,8 +260,12 @@ async function runResolveOperation(options: {
       console.log(`   Address: ${options.address}`);
       console.log(`   Inbox ID: ${resolved}`);
     } else {
+      if (!options.inboxId) {
+        console.error(`❌ Inbox ID is required`);
+        process.exit(1);
+      }
       const inboxState = await agent.client.preferences.inboxStateFromInboxIds(
-        [options.inboxId!],
+        [options.inboxId],
         true,
       );
 
@@ -254,10 +274,11 @@ async function runResolveOperation(options: {
         process.exit(1);
       }
 
-      const address = inboxState[0].identifiers[0]?.identifier;
+      const firstIdentifier = inboxState[0]?.identifiers[0];
+      const address = firstIdentifier?.identifier;
       console.log(`\n📍 Resolution:`);
       console.log(`   Inbox ID: ${options.inboxId}`);
-      console.log(`   Address: ${address || "Unknown"}`);
+      console.log(`   Address: ${address ?? "Unknown"}`);
     }
   } catch (error) {
     console.error(
@@ -305,8 +326,12 @@ async function runInstallationsOperation(options: {
     if (options.inboxId) {
       targetInboxId = options.inboxId;
     } else {
+      if (!options.address) {
+        console.error(`❌ Address is required`);
+        process.exit(1);
+      }
       const resolved = await agent.client.getInboxIdByIdentifier({
-        identifier: options.address!,
+        identifier: options.address,
         identifierKind: 0,
       });
 
@@ -321,9 +346,10 @@ async function runInstallationsOperation(options: {
       );
     }
 
+    const env = (process.env.XMTP_ENV as XmtpEnv | undefined) ?? ("dev" as XmtpEnv);
     const inboxState = await Client.inboxStateFromInboxIds(
       [targetInboxId],
-      (process.env.XMTP_ENV as XmtpEnv) ?? "dev",
+      env,
     );
 
     if (!inboxState || inboxState.length === 0) {
@@ -331,7 +357,12 @@ async function runInstallationsOperation(options: {
       process.exit(1);
     }
 
-    const installations = inboxState[0].installations;
+    const firstState = inboxState[0];
+    if (!firstState) {
+      console.error(`❌ Invalid inbox state`);
+      process.exit(1);
+    }
+    const installations = firstState.installations;
     console.log(`\n📱 Installations:`);
     console.log(`   Total: ${installations.length}`);
     installations.forEach((inst, i) => {
@@ -362,8 +393,12 @@ async function runKeyPackageOperation(options: {
     if (options.inboxId) {
       targetInboxId = options.inboxId;
     } else {
+      if (!options.address) {
+        console.error(`❌ Address is required`);
+        process.exit(1);
+      }
       const resolved = await agent.client.getInboxIdByIdentifier({
-        identifier: options.address!,
+        identifier: options.address,
         identifierKind: 0,
       });
 
@@ -385,7 +420,12 @@ async function runKeyPackageOperation(options: {
       process.exit(1);
     }
 
-    const installations = inboxState[0].installations;
+    const firstState = inboxState[0];
+    if (!firstState) {
+      console.error(`❌ Invalid inbox state`);
+      process.exit(1);
+    }
+    const installations = firstState.installations;
     const installationIds = installations.map(
       (inst: { id: string }) => inst.id,
     );
@@ -396,12 +436,13 @@ async function runKeyPackageOperation(options: {
 
     console.log(`\n🔑 Key Package Status:`);
     console.log(`   Total Installations: ${Object.keys(status).length}`);
-    Object.entries(status).forEach(([id, stat]: [string, any]) => {
+    Object.entries(status).forEach(([id, stat]) => {
       const shortId = id.substring(0, 8) + "...";
-      if (stat?.lifetime) {
+      const statusObj = stat as { lifetime?: unknown; validationError?: string } | undefined;
+      if (statusObj?.lifetime) {
         console.log(`   ✅ ${shortId}: Valid`);
       } else {
-        console.log(`   ❌ ${shortId}: ${stat?.validationError || "Invalid"}`);
+        console.log(`   ❌ ${shortId}: ${statusObj?.validationError ?? "Invalid"}`);
       }
     });
   } catch (error) {

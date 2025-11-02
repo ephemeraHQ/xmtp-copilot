@@ -30,8 +30,16 @@ program
   .option("--target <address>", "Target address to invite")
   .option("--member-addresses <addresses>", "Comma-separated member addresses")
   .option("--image-url <url>", "Image URL for metadata operations")
-  .action(async (operation, options) => {
-    const members = parseInt(options.members) || 1;
+  .action(async (operation, options: {
+    groupId?: string;
+    name?: string;
+    description?: string;
+    members?: string;
+    target?: string;
+    memberAddresses?: string;
+    imageUrl?: string;
+  }) => {
+    const members = parseInt(options.members ?? "1") || 1;
     const memberAddresses = options.memberAddresses
       ? options.memberAddresses.split(",").map((a: string) => a.trim())
       : undefined;
@@ -215,6 +223,7 @@ async function runMetadataOperation(config: {
   }
 
   if (!config.groupName && !config.groupDescription && !config.imageUrl) {
+    // This condition is checked to ensure at least one metadata field is provided
     console.error(
       `❌ At least one of --name, --description, or --image-url is required`,
     );
@@ -226,8 +235,12 @@ async function runMetadataOperation(config: {
   const agent = await getAgent();
 
   try {
+    if (!config.groupId) {
+      console.error(`❌ Group ID is required`);
+      process.exit(1);
+    }
     const group = (await agent.client.conversations.getConversationById(
-      config.groupId!,
+      config.groupId,
     )) as Group;
 
     if (!group) {

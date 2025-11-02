@@ -28,9 +28,15 @@ program
   .option("--offset <count>", "Offset for pagination", "0")
   .option("--inbox-id <id>", "Inbox ID for find operation")
   .option("--address <address>", "Ethereum address for find operation")
-  .action(async (operation, options) => {
-    const limit = parseInt(options.limit) || 50;
-    const offset = parseInt(options.offset) || 0;
+  .action(async (operation, options: {
+    conversationId?: string;
+    limit?: string;
+    offset?: string;
+    inboxId?: string;
+    address?: string;
+  }) => {
+    const limit = parseInt(options.limit ?? "50") || 50;
+    const offset = parseInt(options.offset ?? "0") || 0;
 
     switch (operation) {
       case "conversations":
@@ -150,7 +156,8 @@ async function runMembersOperation(conversationId?: string): Promise<void> {
     console.log(`\n👥 Members:`);
     console.log(`   Total: ${members.length}`);
     members.forEach((member, i) => {
-      console.log(`   ${i + 1}. ${(member as any).inboxId || "Unknown"}`);
+      const memberObj = member as { inboxId?: string };
+      console.log(`   ${i + 1}. ${memberObj.inboxId ?? "Unknown"}`);
     });
   } catch (error) {
     console.error(
@@ -194,11 +201,12 @@ async function runMessagesOperation(config: {
     );
 
     paginated.forEach((msg, i) => {
+      const sentAt = msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown";
       console.log(
-        `\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`,
+        `\n   ${i + 1 + config.offset}. [${String(sentAt)}]`,
       );
-      console.log(`      From: ${msg.senderInboxId || "Unknown"}`);
-      console.log(`      Content: ${msg.content}`);
+      console.log(`      From: ${msg.senderInboxId ?? "Unknown"}`);
+      console.log(`      Content: ${String(msg.content)}`);
     });
   } catch (error) {
     console.error(
@@ -227,8 +235,12 @@ async function runFindOperation(config: {
     if (config.inboxId) {
       targetInboxId = config.inboxId;
     } else {
+      if (!config.address) {
+        console.error(`❌ Address is required`);
+        process.exit(1);
+      }
       const resolved = await agent.client.getInboxIdByIdentifier({
-        identifier: config.address!,
+        identifier: config.address,
         identifierKind: 0,
       });
 
@@ -241,8 +253,8 @@ async function runFindOperation(config: {
     }
 
     // First, try to get a direct DM conversation
-    let foundConversation: Group | Dm | undefined =
-      await agent.client.conversations.getDmByInboxId(targetInboxId);
+    const dmConversation = await agent.client.conversations.getDmByInboxId(targetInboxId);
+    let foundConversation: Group | Dm | undefined = dmConversation;
 
     // If no DM found, search through all conversations (including groups)
     if (!foundConversation) {
@@ -256,7 +268,10 @@ async function runFindOperation(config: {
           const group = conv as Group;
           const members = await group.members();
           const isMember = members.some(
-            (member: any) => member.inboxId === targetInboxId,
+            (member) => {
+              const memberObj = member as { inboxId?: string };
+              return memberObj.inboxId === targetInboxId;
+            },
           );
 
           if (isMember) {
@@ -298,11 +313,12 @@ async function runFindOperation(config: {
     console.log(`   Showing: ${paginated.length}`);
 
     paginated.forEach((msg, i) => {
+      const sentAt = msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown";
       console.log(
-        `\n   ${i + 1 + config.offset}. [${msg.sentAt ? new Date(msg.sentAt).toISOString() : "Unknown"}]`,
+        `\n   ${i + 1 + config.offset}. [${String(sentAt)}]`,
       );
-      console.log(`      From: ${msg.senderInboxId || "Unknown"}`);
-      console.log(`      Content: ${msg.content}`);
+      console.log(`      From: ${msg.senderInboxId ?? "Unknown"}`);
+      console.log(`      Content: ${String(msg.content)}`);
     });
   } catch (error) {
     console.error(
