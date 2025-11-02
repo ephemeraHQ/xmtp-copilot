@@ -3,7 +3,15 @@
 import { Command } from "commander";
 import { Agent } from "@xmtp/agent-sdk";
 import { Client, XmtpEnv } from "@xmtp/node-sdk";
-import "dotenv/config";
+import { config as dotenvConfig } from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+// Load .env from project root
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const rootDir = join(__dirname, "../..", "..");
+dotenvConfig({ path: join(rootDir, ".env") });
 
 const program = new Command();
 
@@ -56,7 +64,7 @@ async function getAgent(): Promise<Agent> {
 
   return Agent.createFromEnv({
     dbPath: (inboxId) =>
-      `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".xmtp"}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+      `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? join(rootDir, ".xmtp")}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
     codecs: [
       new MarkdownCodec(),
       new ReactionCodec(),
