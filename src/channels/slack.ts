@@ -317,7 +317,7 @@ async function cleanupExistingProcesses(): Promise<void> {
 
     exec(
       'ps aux | grep -E "(slack-bot|tsx.*slack)" | grep -v grep',
-      (error, stdout) => {
+      (_error, stdout) => {
         if (stdout.trim()) {
           console.log("⚠️  Found existing processes, terminating...");
 
