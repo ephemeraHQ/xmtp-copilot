@@ -18,14 +18,12 @@
     "chat": "tsx scripts/chat-cli.tsx",
     "format": "prettier -w .",
     "lint": "eslint . --config config/eslint.config.js",
-    "send": "xmtp-cli send",
-    "permissions": "xmtp-cli permissions",
-    "groups": "xmtp-cli groups",
-    "list": "xmtp-cli list",
-    "debug": "xmtp-cli debug",
-    "content": "xmtp-cli content",
-    "ai": "xmtp-cli ai",
-    "xmtp": "xmtp-cli"
+    "send": "tsx ../xmtp-js/sdks/xmtp-cli/commands/send.ts",
+    "permissions": "tsx ../xmtp-js/sdks/xmtp-cli/commands/permissions.ts",
+    "groups": "tsx ../xmtp-js/sdks/xmtp-cli/commands/groups.ts",
+    "list": "tsx ../xmtp-js/sdks/xmtp-cli/commands/list.ts",
+    "debug": "tsx ../xmtp-js/sdks/xmtp-cli/commands/debug.ts",
+    "content": "tsx ../xmtp-js/sdks/xmtp-cli/commands/content-types.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "latest",
