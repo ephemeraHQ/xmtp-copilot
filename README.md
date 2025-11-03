@@ -1,36 +1,22 @@
 # XMTP Copilot
 
-A powerful XMTP copilot that provides CLI commands and Slack bot integration for XMTP protocol testing and management.
-
-```
-xmtp ai
-```
+A powerful XMTP copilot that provides Slack bot integration for XMTP protocol testing and management.
 
 ![](./screenshot.png)
 
 ## Usage
 
-After installation, use the `xmtp` command from anywhere:
+Start the XMTP Copilot service:
 
 ```bash
-# Start Claude Code AI assistant
-xmtp ai
+# Start both XMTP and Slack channels
+yarn start
 
-# Start XMTP channels
-xmtp start              # Both XMTP and Slack channels
-xmtp xmtp               # XMTP channel only
-xmtp slack              # Slack channel only
+# Start XMTP channel only
+yarn dev:xmtp
 
-# Quick command examples
-xmtp groups --members 5 --name "My Group"
-xmtp send --target 0x1234... --message "Hello!"
-xmtp debug info
-xmtp permissions list --group-id <group-id>
-xmtp list
-
-# Get help
-xmtp --help
-xmtp <command> --help
+# Start Slack channel only
+yarn dev:slack
 ```
 
 ## Getting Started
@@ -50,13 +36,6 @@ cd xmtp-copilot
 
 # Install dependencies
 yarn install
-
-# Link globally to use 'xmtp' command anywhere
-yarn link
-
-# Add yarn global bin to your PATH (if not already added)
-echo 'export PATH="$HOME/.yarn/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
 ```
 
 ### Environment variables
