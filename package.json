@@ -23,9 +23,7 @@
     "groups": "npx xmtp-cli groups",
     "list": "npx xmtp-cli list",
     "debug": "npx xmtp-cli debug",
-    "content": "npx xmtp-cli content",
-    "ai": "npx xmtp-cli ai",
-    "xmtp": "npx xmtp-cli"
+    "content": "npx xmtp-cli content"
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "latest",
