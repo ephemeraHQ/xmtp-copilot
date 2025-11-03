@@ -20,10 +20,8 @@
     "jsx": "react",
     "types": ["node"],
     "paths": {
-      "@src/*": ["../src/*"],
-      "@xmtp-copilot/cli": ["../packages/cli/index.ts"],
-      "@xmtp-copilot/cli/*": ["../packages/cli/*"]
+      "@src/*": ["../src/*"]
     }
   },
-  "include": ["../src/**/*.ts", "../scripts/**/*.ts", "../packages/cli/**/*.ts"]
+  "include": ["../src/**/*.ts", "../scripts/**/*.ts"]
 }

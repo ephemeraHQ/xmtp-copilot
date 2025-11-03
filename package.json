@@ -1,15 +1,12 @@
 {
   "name": "xmtp-copilot",
   "version": "0.0.1",
-  "description": "XMTP Copilot - CLI commands and Slack bot integration for XMTP protocol testing and management",
+  "description": "XMTP Copilot - Slack bot integration for XMTP protocol testing and management",
   "type": "module",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
-  "bin": {
-    "xmtp": "./bin/xmtp.js"
-  },
   "scripts": {
     "dev:xmtp": "tsx src/channels/xmtp.ts",
     "dev:slack": "tsx src/channels/slack.ts",
@@ -19,14 +16,16 @@
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .xmtp/ ||: && rimraf logs/ ||  :",
     "chat": "tsx scripts/chat-cli.tsx",
-    "send": "yarn workspace @xmtp-copilot/cli send",
-    "permissions": "yarn workspace @xmtp-copilot/cli permissions",
-    "groups": "yarn workspace @xmtp-copilot/cli groups",
-    "list": "yarn workspace @xmtp-copilot/cli list",
-    "debug": "yarn workspace @xmtp-copilot/cli debug",
-    "content": "yarn workspace @xmtp-copilot/cli content",
     "format": "prettier -w .",
-    "lint": "eslint . --config config/eslint.config.js"
+    "lint": "eslint . --config config/eslint.config.js",
+    "send": "xmtp-cli send",
+    "permissions": "xmtp-cli permissions",
+    "groups": "xmtp-cli groups",
+    "list": "xmtp-cli list",
+    "debug": "xmtp-cli debug",
+    "content": "xmtp-cli content",
+    "ai": "xmtp-cli ai",
+    "xmtp": "xmtp-cli"
   },
   "dependencies": {
     "@anthropic-ai/claude-code": "latest",
