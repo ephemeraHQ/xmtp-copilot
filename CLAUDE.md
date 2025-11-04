@@ -20,125 +20,125 @@ You are aa helpful assistant that can help me with XMTP tasks. You can be asked 
 # Groups
 
 ## Create a DM with target address
-yarn groups create --target 0x123... --name "My DM"
+xmtp groups create --target 0x123... --name "My DM"
 
 ## Create group by Ethereum addresses
-yarn groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."
+xmtp groups create-by-address --name "Address Group" --member-addresses "0x123...,0x456..."
 
 ## Create group with specific address + random addresses
-yarn groups create-by-address --name "My Group" --member-addresses "0x123..." --members 3
+xmtp groups create-by-address --name "My Group" --member-addresses "0x123..." --members 3
 
 ## Update group metadata
-yarn groups metadata --group-id <group-id> --name "New Name" --description "New description"
+xmtp groups metadata --group-id <group-id> --name "New Name" --description "New description"
 
 ## List group members and permissions
-yarn permissions list --group-id <group-id>
+xmtp permissions list --group-id <group-id>
 
 ## Get detailed group information
-yarn permissions info --group-id <group-id>
+xmtp permissions info --group-id <group-id>
 
 
 # Update group permissions
 
-yarn permissions update-permissions --group-id <group-id> --features add-member,remove-member --permissions admin-only
+xmtp permissions update-permissions --group-id <group-id> --features add-member,remove-member --permissions admin-only
 
 ## Send single message to target
-yarn send --target 0x1234... --message "Hello!"
+xmtp send --target 0x1234... --message "Hello!"
 
 ## Send multiple messages for testing
-yarn send --target 0x1234... --users 10
+xmtp send --target 0x1234... --users 10
 
 ## Send message to group
-yarn send --group-id abc123... --message "Hello group!"
+xmtp send --group-id abc123... --message "Hello group!"
 
 ## Performance testing with multiple attempts
-yarn send --target 0x1234... --users 500 --attempts 10
+xmtp send --target 0x1234... --users 500 --attempts 10
 
 ## Wait for responses
-yarn send --target 0x1234... --users 100 --wait
+xmtp send --target 0x1234... --users 100 --wait
 
 
 # List Operations
 
 ## List all conversations
-yarn list conversations
+xmtp list conversations
 
 ## List conversations with pagination
-yarn list conversations --limit 20
+xmtp list conversations --limit 20
 
 ## List conversations with custom offset
-yarn list conversations --limit 10 --offset 20
+xmtp list conversations --limit 10 --offset 20
 
 ## List members from a conversation
-yarn list members --conversation-id <conversation-id>
+xmtp list members --conversation-id <conversation-id>
 
 ## List messages from a conversation
-yarn list messages --conversation-id <conversation-id>
+xmtp list messages --conversation-id <conversation-id>
 
 ## List messages with pagination
-yarn list messages --conversation-id <conversation-id> --limit 10
+xmtp list messages --conversation-id <conversation-id> --limit 10
 
 ## List messages with custom offset
-yarn list messages --conversation-id <conversation-id> --limit 10 --offset 5
+xmtp list messages --conversation-id <conversation-id> --limit 10 --offset 5
 
 ## Find conversation by inbox ID and get messages
-yarn list find --inbox-id <inbox-id>
-yarn list find --inbox-id <inbox-id> --limit 5
+xmtp list find --inbox-id <inbox-id>
+xmtp list find --inbox-id <inbox-id> --limit 5
 
 ## Find conversation by address and get messages
-yarn list find --address <ethereum-address>
-yarn list find --address <ethereum-address> --limit 5
+xmtp list find --address <ethereum-address>
+xmtp list find --address <ethereum-address> --limit 5
 
 
 # Debug & Information
 
 ## Get general system information
-yarn debug info
+xmtp debug info
 
 ## Get address information
-yarn debug address --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
-yarn debug address --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+xmtp debug address --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+xmtp debug address --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
 ## Resolve address to inbox ID (or inbox ID to address)
-yarn debug resolve --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
-yarn debug resolve --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+xmtp debug resolve --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+xmtp debug resolve --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
 ## Get inbox information
-yarn debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-yarn debug inbox --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+xmtp debug inbox --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+xmtp debug inbox --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Check key package status
-yarn debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-yarn debug key-package --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+xmtp debug key-package --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+xmtp debug key-package --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 ## Get installation information for an inbox
-yarn debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-yarn debug installations --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
+xmtp debug installations --inbox-id 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+xmtp debug installations --address 0xe089d4e01a5cd0af7c119abce22b7828851cd387
 
 
 # Content Types
 
 ## Send text message with reply and reaction
-yarn content text --target 0x1234...
+xmtp content text --target 0x1234...
 
 ## Send markdown formatted message
-yarn content markdown --target 0x1234...
+xmtp content markdown --target 0x1234...
 
 ## Send remote attachment
-yarn content attachment --target 0x1234...
+xmtp content attachment --target 0x1234...
 
 ## Send transaction frame (USDC)
-yarn content transaction --target 0x1234... --amount 0.5
+xmtp content transaction --target 0x1234... --amount 0.5
 
 ## Send deeplink to create conversation
-yarn content deeplink --target 0x1234...
+xmtp content deeplink --target 0x1234...
 
 ## Send mini app URL
-yarn content miniapp --target 0x1234...
+xmtp content miniapp --target 0x1234...
 
 ## Send content to a group
-yarn content text --group-id <group-id>
-yarn content markdown --group-id <group-id>
+xmtp content text --group-id <group-id>
+xmtp content markdown --group-id <group-id>
 ```
 
 Nothing else. Be helpful and friendly.
@@ -155,7 +155,7 @@ send the same message 2 times to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 (a n
 
 **cli commands:**
 
-> yarn send --target 0x1234... --message "Hello!"
+> xmtp send --target 0x1234... --message "Hello!"
 
 ### Group creation
 
@@ -165,8 +165,8 @@ create a group with 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5 and send 3 messag
 
 **cli commands:**
 
-> yarn groups create-by-address --name "My Group" --member-addresses "0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5" --members 3
-> yarn send --group-id <group-id> --message "Hello!" && yarn send --group-id <group-id> --message "Second message!" && yarn send --group-id <group-id> --message "Third message!"
+> xmtp groups create-by-address --name "My Group" --member-addresses "0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5" --members 3
+> xmtp send --group-id <group-id> --message "Hello!" && xmtp send --group-id <group-id> --message "Second message!" && xmtp send --group-id <group-id> --message "Third message!"
 
 ### Debug address
 
@@ -176,7 +176,7 @@ get information for the address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 **cli commands:**
 
-> yarn debug address --address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
+> xmtp debug address --address 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 ### agent health
 
@@ -187,9 +187,9 @@ check the health of the agent bankr
 **cli commands:**
 
 > check data/agents.ts for the address and then run the command
-> yarn send --target 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d --message "hi"
+> xmtp send --target 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d --message "hi"
 > sleep 10 seconds
-> yarn list messages --conversation-id <conversation-id> and check if the message is there
+> xmtp list messages --conversation-id <conversation-id> and check if the message is there
 
 ### content types
 
@@ -199,7 +199,7 @@ send an image to 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 **cli commands:**
 
-> yarn content attachment --target 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
+> xmtp content attachment --target 0xe709fDa144F82Fd0A250f4E6d052c41c98087cF5
 
 ### fetch latest messages from a conversation
 
@@ -209,4 +209,4 @@ fetch the latest messages from the conversation with agent bankr
 
 **cli commands:**
 
-> yarn list find --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (finds conversation and shows messages directly)
+> xmtp list find --address 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d (finds conversation and shows messages directly)
